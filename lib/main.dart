@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:clothes_tracker/pages/homepage.dart';
+import 'package:clothes_tracker/utils/nav.dart';
 import 'package:clothes_tracker/themes.dart';
 import 'package:get/get.dart';
 
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
       theme: appLightTheme,
       darkTheme: appDarkTheme,
       themeMode: ThemeMode.system,
-      home: const HomePage(),
+      home: NavBar(),
     );
   }
 }

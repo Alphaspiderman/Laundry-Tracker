@@ -1,6 +1,7 @@
 import 'package:clothes_tracker/pages/basket_page.dart';
 import 'package:clothes_tracker/pages/closet_page.dart';
 import 'package:clothes_tracker/pages/home_page.dart';
+import 'package:clothes_tracker/pages/laundry_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -23,7 +24,12 @@ class CustomBottomNavBar extends StatelessWidget {
       body: Obx(
         () => IndexedStack(
           index: navController.idx.value,
-          children: const [HomePage(), BasketPage(), ClosetPage()],
+          children: const [
+            HomePage(),
+            BasketPage(),
+            ClosetPage(),
+            LaundryPage()
+          ],
         ),
       ),
       bottomNavigationBar: Obx(

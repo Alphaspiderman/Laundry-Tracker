@@ -1,5 +1,6 @@
+import 'package:clothes_tracker/pages/base.dart';
+import 'package:clothes_tracker/pages/closet_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 class HomePage extends StatelessWidget {
@@ -7,33 +8,26 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        systemOverlayStyle: Get.isDarkMode
-            ? SystemUiOverlayStyle.light
-            : SystemUiOverlayStyle.dark,
-        title: Text(
-          Get.isDarkMode ? 'Dark Theme' : 'Light Theme',
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-        actions: [
-          IconButton(
-              onPressed: () {
-                Get.changeThemeMode(
-                    Get.isDarkMode ? ThemeMode.light : ThemeMode.dark);
-              },
-              icon: Icon(
-                  Get.isDarkMode ? Icons.dark_mode : Icons.dark_mode_outlined))
+    Widget body = Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          OutlinedButton(
+            onPressed: () {
+              Get.snackbar("Test", "Hello!");
+            },
+            child: const Text('Trigger Snack'),
+          ),
+          OutlinedButton(
+            onPressed: () {
+              Get.to(() => const ClosetPage());
+            },
+            child: const Text('Goto Page 1'),
+          ),
         ],
       ),
-      body: Center(
-        child: OutlinedButton(
-          onPressed: () {
-            Get.snackbar("Title", "message");
-          },
-          child: const Text('Trigger Snack'),
-        ),
-      ),
     );
+
+    return BasePage(title: "Home Page", body: body);
   }
 }

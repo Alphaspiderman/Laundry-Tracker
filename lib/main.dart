@@ -1,10 +1,17 @@
+import 'package:clothes_tracker/utils/controller.dart';
 import 'package:flutter/material.dart';
 import 'package:clothes_tracker/utils/nav.dart';
 import 'package:clothes_tracker/themes/dark.dart';
 import 'package:clothes_tracker/themes/light.dart';
 import 'package:get/get.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  DBController db = DBController();
+  db.initClass();
+  Get.put(db.db);
+
+  // await Get.putAsync(() async => DBController().initClass());
   runApp(const MyApp());
 }
 
@@ -19,7 +26,8 @@ class MyApp extends StatelessWidget {
       theme: appLightTheme,
       darkTheme: appDarkTheme,
       themeMode: ThemeMode.system,
-      home: const PageWithNavBar(),
+      home: PageWithNavBar(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

@@ -1,5 +1,4 @@
-import 'package:clothes_tracker/pages/base.dart';
-import 'package:clothes_tracker/pages/closet_page.dart';
+import 'package:clothes_tracker/utils/base.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -17,13 +16,7 @@ class HomePage extends StatelessWidget {
               Get.snackbar("Test", "Hello!");
             },
             child: const Text('Trigger Snack'),
-          ),
-          OutlinedButton(
-            onPressed: () {
-              Get.to(() => const ClosetPage());
-            },
-            child: const Text('Goto Page 1'),
-          ),
+          )
         ],
       ),
     );

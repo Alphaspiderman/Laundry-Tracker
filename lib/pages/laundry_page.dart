@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:clothes_tracker/utils/base.dart';
 
-class ClosetPage extends StatelessWidget {
-  const ClosetPage({Key? key}) : super(key: key);
+class LaundryPage extends StatelessWidget {
+  const LaundryPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return const BasePage(
-      title: "Closet",
+      title: "Laundry",
       body: Center(
-        child: Text('Closet'),
+        child: Text('Laundry'),
       ),
     );
   }

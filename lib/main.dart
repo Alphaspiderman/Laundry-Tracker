@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
       theme: appLightTheme,
       darkTheme: appDarkTheme,
       themeMode: ThemeMode.system,
-      home: NavBar(),
+      home: const PageWithNavBar(),
     );
   }
 }

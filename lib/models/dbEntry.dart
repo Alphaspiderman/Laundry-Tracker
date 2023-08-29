@@ -15,8 +15,8 @@ class ItemCard {
   factory ItemCard.fromMap(Map<String, dynamic> json) => ItemCard(
         id: 0,
         name: json["name"],
-        state: json["status"],
-        imagePath: json["image"],
+        state: json["state"],
+        imagePath: json["image_path"],
       );
 
   // Make a method to convert a Card to a map

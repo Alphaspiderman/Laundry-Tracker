@@ -4,7 +4,7 @@ import 'package:clothes_tracker/models/state.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'package:clothes_tracker/models/dbEntry.dart';
+import 'package:clothes_tracker/models/db_entry.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();

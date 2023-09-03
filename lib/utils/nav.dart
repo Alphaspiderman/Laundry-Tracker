@@ -2,10 +2,14 @@ import 'package:clothes_tracker/pages/basket_page.dart';
 import 'package:clothes_tracker/pages/closet_page.dart';
 import 'package:clothes_tracker/pages/home_page.dart';
 import 'package:clothes_tracker/pages/laundry_page.dart';
+import 'package:clothes_tracker/pages/temp.dart';
+import 'package:clothes_tracker/utils/db.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class PageWithNavBar extends StatefulWidget {
-  const PageWithNavBar({super.key});
+  PageWithNavBar({super.key});
+  final DatabaseHelper dbHelper = Get.find();
 
   @override
   _PageWithNavBarState createState() => _PageWithNavBarState();
@@ -18,7 +22,8 @@ class _PageWithNavBarState extends State<PageWithNavBar> {
     const HomePage(),
     const BasketPage(),
     const ClosetPage(),
-    const LaundryPage()
+    const DebugPage(),
+    const LaundryPage(),
   ];
 
   @override

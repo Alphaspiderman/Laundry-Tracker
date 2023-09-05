@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:clothes_tracker/models/state.dart';
 import 'package:clothes_tracker/pages/create_entry.dart';
+import 'package:clothes_tracker/ui/app_bar.dart';
 import 'package:clothes_tracker/utils/db.dart';
 import 'package:flutter/material.dart';
 import 'package:clothes_tracker/models/db_entry.dart';
@@ -25,8 +26,8 @@ class _DebugPageState extends State<DebugPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Your List'),
+      appBar: const CustomAppBar(
+        title: "Debug Page",
       ),
       // Add a FAB to create DB entry
       floatingActionButton: FloatingActionButton(

@@ -102,6 +102,18 @@ class DatabaseHelper {
     );
   }
 
+  // Update State
+  Future<void> updateState(int id, States state) async {
+    Database db = await database;
+    int dbState = state.index;
+    await db.update(
+      'clothes',
+      {'state': dbState},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
   // Delete a card
   Future<void> deleteData(String id) async {
     Database db = await database;

@@ -13,7 +13,7 @@ class ItemCard {
 
   // Make a factory constructor to create a Card from a map
   factory ItemCard.fromMap(Map<String, dynamic> json) => ItemCard(
-        id: 0,
+        id: json["id"],
         name: json["name"],
         state: json["state"],
         imagePath: json["image_path"],

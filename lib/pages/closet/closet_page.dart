@@ -1,20 +1,21 @@
 import 'dart:io';
 import 'package:clothes_tracker/models/state.dart';
-import 'package:clothes_tracker/pages/create_entry.dart';
+import 'package:clothes_tracker/models/status.dart';
+import 'package:clothes_tracker/views/create_entry.dart';
 import 'package:clothes_tracker/ui/app_bar.dart';
 import 'package:clothes_tracker/utils/db.dart';
 import 'package:flutter/material.dart';
 import 'package:clothes_tracker/models/db_entry.dart';
 import 'package:get/get.dart';
 
-class LaundryPage extends StatefulWidget {
-  const LaundryPage({super.key});
+class ClosetPage extends StatefulWidget {
+  const ClosetPage({super.key});
 
   @override
-  _LaundryPageState createState() => _LaundryPageState();
+  _ClosetPageState createState() => _ClosetPageState();
 }
 
-class _LaundryPageState extends State<LaundryPage> {
+class _ClosetPageState extends State<ClosetPage> {
   final dbHelper = DatabaseHelper();
 
   @override
@@ -27,19 +28,28 @@ class _LaundryPageState extends State<LaundryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(
-        title: "Laundry",
+        title: "Closet",
       ),
       // Add a FAB to create DB entry
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           // Create a DB entry taking data from user input
-          Get.to(() => const DataCaptureScreen());
+          Status snack = await Get.to(() => const DataCaptureScreen());
+          switch (snack) {
+            case Status.success:
+              Get.snackbar(
+                'Success',
+                'Data saved successfully',
+              );
+              break;
+            default:
+          }
           setState(() {});
         },
         child: const Icon(Icons.add),
       ),
       body: FutureBuilder(
-        future: dbHelper.fetchDataByState(States.wash),
+        future: dbHelper.fetchDataByState(States.closet),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -84,7 +94,7 @@ class _LaundryPageState extends State<LaundryPage> {
                               // Show a notification
                               Get.snackbar(
                                 'Success',
-                                'Item moved to Basket',
+                                'Item moved to basket',
                                 duration: const Duration(seconds: 3),
                               );
                               // Rebuild the view
@@ -92,17 +102,17 @@ class _LaundryPageState extends State<LaundryPage> {
                             },
                           ),
                           OutlinedButton(
-                            child: const Text('Move to Closet'),
+                            child: const Text('Send to Laundry'),
                             onPressed: () async {
                               // Use the updateState on database
                               await dbHelper.updateState(
                                 dataList[index].id,
-                                States.closet,
+                                States.wash,
                               );
                               // Show a notification
                               Get.snackbar(
                                 'Success',
-                                'Item moved to Closet',
+                                'Item moved to Laundry',
                                 duration: const Duration(seconds: 3),
                               );
                               // Rebuild the view

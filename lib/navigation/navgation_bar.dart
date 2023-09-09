@@ -1,8 +1,8 @@
-import 'package:clothes_tracker/pages/basket_page.dart';
-import 'package:clothes_tracker/pages/closet_page.dart';
-import 'package:clothes_tracker/pages/home_page.dart';
-import 'package:clothes_tracker/pages/laundry_page.dart';
-import 'package:clothes_tracker/pages/temp.dart';
+import 'package:clothes_tracker/pages/basket/basket_page.dart';
+import 'package:clothes_tracker/pages/closet/closet_page.dart';
+import 'package:clothes_tracker/pages/home/home_page.dart';
+import 'package:clothes_tracker/pages/laundry/laundry_page.dart';
+import 'package:clothes_tracker/pages/debug/debug.dart';
 import 'package:clothes_tracker/utils/db.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -22,8 +22,9 @@ class _PageWithNavBarState extends State<PageWithNavBar> {
     const HomePage(),
     const BasketPage(),
     const ClosetPage(),
-    const DebugPage(),
+    // const DebugPage(),
     const LaundryPage(),
+    const DebugPage(),
   ];
 
   @override

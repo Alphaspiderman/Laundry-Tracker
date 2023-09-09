@@ -1,20 +1,20 @@
 import 'dart:io';
 import 'package:clothes_tracker/models/state.dart';
-import 'package:clothes_tracker/pages/create_entry.dart';
+import 'package:clothes_tracker/views/create_entry.dart';
 import 'package:clothes_tracker/ui/app_bar.dart';
 import 'package:clothes_tracker/utils/db.dart';
 import 'package:flutter/material.dart';
 import 'package:clothes_tracker/models/db_entry.dart';
 import 'package:get/get.dart';
 
-class BasketPage extends StatefulWidget {
-  const BasketPage({super.key});
+class DebugPage extends StatefulWidget {
+  const DebugPage({super.key});
 
   @override
-  _BasketPageState createState() => _BasketPageState();
+  _DebugPageState createState() => _DebugPageState();
 }
 
-class _BasketPageState extends State<BasketPage> {
+class _DebugPageState extends State<DebugPage> {
   final dbHelper = DatabaseHelper();
 
   @override
@@ -27,7 +27,7 @@ class _BasketPageState extends State<BasketPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(
-        title: "Basket",
+        title: "Debug Page",
       ),
       // Add a FAB to create DB entry
       floatingActionButton: FloatingActionButton(
@@ -39,7 +39,7 @@ class _BasketPageState extends State<BasketPage> {
         child: const Icon(Icons.add),
       ),
       body: FutureBuilder(
-        future: dbHelper.fetchDataByState(States.basket),
+        future: dbHelper.fetchData(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -92,6 +92,24 @@ class _BasketPageState extends State<BasketPage> {
                             },
                           ),
                           OutlinedButton(
+                            child: const Text('Move to Basket'),
+                            onPressed: () async {
+                              // Use the updateState on database
+                              await dbHelper.updateState(
+                                dataList[index].id,
+                                States.basket,
+                              );
+                              // Show a notification
+                              Get.snackbar(
+                                'Success',
+                                'Item moved to Basket',
+                                duration: const Duration(seconds: 3),
+                              );
+                              // Rebuild the view
+                              setState(() {});
+                            },
+                          ),
+                          OutlinedButton(
                             child: const Text('Send to Laundry'),
                             onPressed: () async {
                               // Use the updateState on database
@@ -108,7 +126,7 @@ class _BasketPageState extends State<BasketPage> {
                               // Rebuild the view
                               setState(() {});
                             },
-                          )
+                          ),
                         ],
                       )
                     ],

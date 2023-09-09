@@ -25,24 +25,26 @@ class _HomePageState extends State<HomePage> {
       appBar: const CustomAppBar(
         title: "Home",
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          OutlinedButton(
-            onPressed: () {
-              Get.snackbar("Test", "Hello!");
-            },
-            child: const Text('Trigger Snack'),
-          ),
-          // Add a button to purge the DB
-          OutlinedButton(
-            onPressed: () async {
-              await dbHelper.purgeData();
-              Get.snackbar("Purge", "DB Purged!");
-            },
-            child: const Text('Purge DB'),
-          ),
-        ],
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            OutlinedButton(
+              onPressed: () {
+                Get.snackbar("Test", "Hello!");
+              },
+              child: const Text('Trigger Snack'),
+            ),
+            // Add a button to purge the DB
+            OutlinedButton(
+              onPressed: () async {
+                await dbHelper.purgeData();
+                Get.snackbar("Purge", "DB Purged!");
+              },
+              child: const Text('Purge DB'),
+            ),
+          ],
+        ),
       ),
     );
   }

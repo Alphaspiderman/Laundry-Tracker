@@ -88,13 +88,41 @@ class _LaundryPageState extends State<LaundryPage> {
                       ),
                       ButtonBar(
                         children: [
-                          TextButton(
+                          OutlinedButton(
                             child: const Text('Move to Basket'),
-                            onPressed: () {/* ... */},
+                            onPressed: () async {
+                              // Use the updateState on database
+                              await dbHelper.updateState(
+                                dataList[index].id,
+                                States.basket,
+                              );
+                              // Show a notification
+                              Get.snackbar(
+                                'Success',
+                                'Item moved to Basket',
+                                duration: const Duration(seconds: 3),
+                              );
+                              // Rebuild the view
+                              setState(() {});
+                            },
                           ),
-                          TextButton(
+                          OutlinedButton(
                             child: const Text('Move to Closet'),
-                            onPressed: () {/* ... */},
+                            onPressed: () async {
+                              // Use the updateState on database
+                              await dbHelper.updateState(
+                                dataList[index].id,
+                                States.closet,
+                              );
+                              // Show a notification
+                              Get.snackbar(
+                                'Success',
+                                'Item moved to Closet',
+                                duration: const Duration(seconds: 3),
+                              );
+                              // Rebuild the view
+                              setState(() {});
+                            },
                           )
                         ],
                       )

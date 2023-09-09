@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:clothes_tracker/models/state.dart';
 import 'package:clothes_tracker/pages/create_entry.dart';
 import 'package:clothes_tracker/utils/db.dart';
 import 'package:flutter/material.dart';
@@ -71,14 +72,60 @@ class _DebugPageState extends State<DebugPage> {
                       ),
                       ButtonBar(
                         children: [
-                          TextButton(
-                            child: const Text('Move to Basket'),
-                            onPressed: () {/* ... */},
+                          OutlinedButton(
+                            child: const Text('Move to Closet'),
+                            onPressed: () async {
+                              // Use the updateState on database
+                              await dbHelper.updateState(
+                                dataList[index].id,
+                                States.closet,
+                              );
+                              // Show a notification
+                              Get.snackbar(
+                                'Success',
+                                'Item moved to Closet',
+                                duration: const Duration(seconds: 3),
+                              );
+                              // Rebuild the view
+                              setState(() {});
+                            },
                           ),
-                          TextButton(
+                          OutlinedButton(
+                            child: const Text('Move to Basket'),
+                            onPressed: () async {
+                              // Use the updateState on database
+                              await dbHelper.updateState(
+                                dataList[index].id,
+                                States.basket,
+                              );
+                              // Show a notification
+                              Get.snackbar(
+                                'Success',
+                                'Item moved to Basket',
+                                duration: const Duration(seconds: 3),
+                              );
+                              // Rebuild the view
+                              setState(() {});
+                            },
+                          ),
+                          OutlinedButton(
                             child: const Text('Send to Laundry'),
-                            onPressed: () {/* ... */},
-                          )
+                            onPressed: () async {
+                              // Use the updateState on database
+                              await dbHelper.updateState(
+                                dataList[index].id,
+                                States.wash,
+                              );
+                              // Show a notification
+                              Get.snackbar(
+                                'Success',
+                                'Item moved to Laundry',
+                                duration: const Duration(seconds: 3),
+                              );
+                              // Rebuild the view
+                              setState(() {});
+                            },
+                          ),
                         ],
                       )
                     ],

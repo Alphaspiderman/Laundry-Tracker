@@ -98,13 +98,41 @@ class _ClosetPageState extends State<ClosetPage> {
                       ),
                       ButtonBar(
                         children: [
-                          TextButton(
+                          OutlinedButton(
                             child: const Text('Move to Basket'),
-                            onPressed: () {/* ... */},
+                            onPressed: () async {
+                              // Use the updateState on database
+                              await dbHelper.updateState(
+                                dataList[index].id,
+                                States.basket,
+                              );
+                              // Show a notification
+                              Get.snackbar(
+                                'Success',
+                                'Item moved to basket',
+                                duration: const Duration(seconds: 3),
+                              );
+                              // Rebuild the view
+                              setState(() {});
+                            },
                           ),
-                          TextButton(
+                          OutlinedButton(
                             child: const Text('Send to Laundry'),
-                            onPressed: () {/* ... */},
+                            onPressed: () async {
+                              // Use the updateState on database
+                              await dbHelper.updateState(
+                                dataList[index].id,
+                                States.wash,
+                              );
+                              // Show a notification
+                              Get.snackbar(
+                                'Success',
+                                'Item moved to Laundry',
+                                duration: const Duration(seconds: 3),
+                              );
+                              // Rebuild the view
+                              setState(() {});
+                            },
                           )
                         ],
                       )

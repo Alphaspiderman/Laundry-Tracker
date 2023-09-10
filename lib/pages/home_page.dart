@@ -1,4 +1,4 @@
-import 'package:clothes_tracker/utils/base.dart';
+import 'package:clothes_tracker/ui/app_bar.dart';
 import 'package:clothes_tracker/utils/db.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -21,8 +21,11 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    Widget body = Center(
-      child: Column(
+    return Scaffold(
+      appBar: const CustomAppBar(
+        title: "Home",
+      ),
+      body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           OutlinedButton(
@@ -42,7 +45,5 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
     );
-
-    return BasePage(title: "Home Page", body: body);
   }
 }

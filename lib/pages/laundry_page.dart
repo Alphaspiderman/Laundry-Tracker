@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:clothes_tracker/models/state.dart';
 import 'package:clothes_tracker/pages/create_entry.dart';
+import 'package:clothes_tracker/ui/app_bar.dart';
 import 'package:clothes_tracker/utils/db.dart';
 import 'package:flutter/material.dart';
 import 'package:clothes_tracker/models/db_entry.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 class LaundryPage extends StatefulWidget {
@@ -26,23 +26,8 @@ class _LaundryPageState extends State<LaundryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        systemOverlayStyle: Get.isDarkMode
-            ? SystemUiOverlayStyle.light
-            : SystemUiOverlayStyle.dark,
-        title: Text(
-          "Laundry",
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-        actions: [
-          IconButton(
-              onPressed: () {
-                Get.changeThemeMode(
-                    Get.isDarkMode ? ThemeMode.light : ThemeMode.dark);
-              },
-              icon: Icon(
-                  Get.isDarkMode ? Icons.dark_mode : Icons.dark_mode_outlined))
-        ],
+      appBar: const CustomAppBar(
+        title: "Laundry",
       ),
       // Add a FAB to create DB entry
       floatingActionButton: FloatingActionButton(

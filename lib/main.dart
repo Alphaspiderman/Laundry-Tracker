@@ -1,4 +1,8 @@
+import 'package:clothes_tracker/pages/basket/basket_page.dart';
+import 'package:clothes_tracker/pages/closet/closet_page.dart';
+import 'package:clothes_tracker/pages/debug/debug.dart';
 import 'package:clothes_tracker/pages/home/home_page.dart';
+import 'package:clothes_tracker/pages/laundry/laundry_page.dart';
 import 'package:clothes_tracker/utils/controller.dart';
 import 'package:flutter/material.dart';
 import 'package:clothes_tracker/themes/dark.dart';
@@ -26,8 +30,16 @@ class MyApp extends StatelessWidget {
       theme: appLightTheme,
       darkTheme: appDarkTheme,
       themeMode: ThemeMode.system,
-      home: const HomePage(),
+      // home: const HomePage(),
       debugShowCheckedModeBanner: false,
+      initialRoute: '/home',
+      getPages: [
+        GetPage(name: '/home', page: () => const HomePage()),
+        GetPage(name: '/closet', page: () => const ClosetPage()),
+        GetPage(name: '/basket', page: () => const BasketPage()),
+        GetPage(name: '/laundry', page: () => const LaundryPage()),
+        GetPage(name: '/debug', page: () => const DebugPage()),
+      ],
     );
   }
 }

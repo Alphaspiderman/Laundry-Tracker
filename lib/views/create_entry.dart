@@ -4,7 +4,7 @@ import 'package:clothes_tracker/models/db_entry.dart';
 import 'package:clothes_tracker/models/state.dart';
 import 'package:clothes_tracker/models/status.dart';
 import 'package:clothes_tracker/utils/db.dart';
-import 'package:clothes_tracker/utils/imgpicker.dart';
+import 'package:clothes_tracker/views/imgpicker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

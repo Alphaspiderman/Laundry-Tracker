@@ -1,6 +1,6 @@
 import 'package:clothes_tracker/utils/controller.dart';
 import 'package:flutter/material.dart';
-import 'package:clothes_tracker/utils/nav.dart';
+import 'package:clothes_tracker/navigation/navgation_bar.dart';
 import 'package:clothes_tracker/themes/dark.dart';
 import 'package:clothes_tracker/themes/light.dart';
 import 'package:get/get.dart';

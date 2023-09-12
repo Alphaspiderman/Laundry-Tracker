@@ -1,3 +1,4 @@
+import 'package:clothes_tracker/navigation/navgation_bar.dart';
 import 'package:clothes_tracker/ui/app_bar.dart';
 import 'package:clothes_tracker/utils/db.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +47,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
+      bottomNavigationBar: const NavBar(itemIndex: 0),
     );
   }
 }

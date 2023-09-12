@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:clothes_tracker/models/state.dart';
 import 'package:clothes_tracker/models/status.dart';
+import 'package:clothes_tracker/navigation/navgation_bar.dart';
 import 'package:clothes_tracker/views/create_entry.dart';
 import 'package:clothes_tracker/ui/app_bar.dart';
 import 'package:clothes_tracker/utils/db.dart';
@@ -30,6 +31,7 @@ class _ClosetPageState extends State<ClosetPage> {
       appBar: const CustomAppBar(
         title: "Closet",
       ),
+      bottomNavigationBar: const NavBar(itemIndex: 1),
       // Add a FAB to create DB entry
       floatingActionButton: FloatingActionButton(
         onPressed: () async {

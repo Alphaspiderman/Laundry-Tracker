@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:clothes_tracker/models/state.dart';
+import 'package:clothes_tracker/navigation/navgation_bar.dart';
 import 'package:clothes_tracker/views/create_entry.dart';
 import 'package:clothes_tracker/ui/app_bar.dart';
 import 'package:clothes_tracker/utils/db.dart';
@@ -38,6 +39,7 @@ class _BasketPageState extends State<BasketPage> {
         },
         child: const Icon(Icons.add),
       ),
+      bottomNavigationBar: const NavBar(itemIndex: 2),
       body: FutureBuilder(
         future: dbHelper.fetchDataByState(States.basket),
         builder: (context, snapshot) {
@@ -114,14 +116,6 @@ class _BasketPageState extends State<BasketPage> {
                     ],
                   ),
                 );
-
-                // return Card(
-                //   child: ListTile(
-                //     leading: Image.file(File(dataList[index].imagePath)),
-                //     title: Text(dataList[index].name),
-                //     subtitle: Text(dataList[index].state.toString()),
-                //   ),
-                // );
               },
             );
           }

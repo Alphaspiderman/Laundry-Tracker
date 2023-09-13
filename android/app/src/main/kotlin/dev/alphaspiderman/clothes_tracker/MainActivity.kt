@@ -1,4 +1,4 @@
-package com.example.clothes_tracker
+package dev.alphaspiderman.clothes_tracker
 
 import io.flutter.embedding.android.FlutterActivity
 

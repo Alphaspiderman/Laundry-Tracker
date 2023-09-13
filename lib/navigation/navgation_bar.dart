@@ -1,8 +1,3 @@
-import 'package:clothes_tracker/pages/basket/basket_page.dart';
-import 'package:clothes_tracker/pages/closet/closet_page.dart';
-import 'package:clothes_tracker/pages/home/home_page.dart';
-import 'package:clothes_tracker/pages/laundry/laundry_page.dart';
-import 'package:clothes_tracker/pages/debug/debug.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -14,22 +9,24 @@ class NavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> pages = [
-      const HomePage(),
-      const ClosetPage(),
-      const BasketPage(),
+    List<String> pages = [
+      '/home',
+      '/closet',
+      '/basket',
     ];
     if (debug) {
-      pages.add(const DebugPage());
+      pages.add('/debug');
     } else {
-      pages.add(const LaundryPage());
+      pages.add('/laundry');
     }
 
     return BottomNavigationBar(
       currentIndex: itemIndex,
       onTap: (index) {
-        // Navigate via GetX
-        Get.offAll(pages[index]);
+        if (itemIndex != 0) {
+          Get.back();
+        }
+        Get.toNamed(pages[index]);
       },
       items: getNavBarItems(debug),
       selectedItemColor:
@@ -40,11 +37,11 @@ class NavBar extends StatelessWidget {
   }
 
   List<BottomNavigationBarItem> getNavBarItems(bool debug) {
-    List<BottomNavigationBarItem> items = const [
-      BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-      BottomNavigationBarItem(
+    List<BottomNavigationBarItem> items = [
+      const BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+      const BottomNavigationBarItem(
           icon: Icon(Icons.door_sliding_rounded), label: "Closet"),
-      BottomNavigationBarItem(
+      const BottomNavigationBarItem(
           icon: Icon(Icons.shopping_basket), label: "Laundry Basket"),
     ];
     if (debug) {

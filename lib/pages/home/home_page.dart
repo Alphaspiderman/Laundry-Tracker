@@ -2,6 +2,7 @@ import 'package:clothes_tracker/navigation/navgation_bar.dart';
 import 'package:clothes_tracker/ui/app_bar.dart';
 import 'package:clothes_tracker/utils/db.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,6 +17,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    FlutterNativeSplash.remove();
     super.initState();
     dbHelper = Get.find();
   }

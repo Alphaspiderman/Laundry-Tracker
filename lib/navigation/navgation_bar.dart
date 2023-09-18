@@ -3,9 +3,8 @@ import 'package:get/get.dart';
 
 class NavBar extends StatelessWidget {
   final int itemIndex;
-  final bool debug;
 
-  const NavBar({required this.itemIndex, this.debug = false, super.key});
+  const NavBar({required this.itemIndex, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,12 +12,8 @@ class NavBar extends StatelessWidget {
       '/home',
       '/closet',
       '/basket',
+      '/laundry',
     ];
-    if (debug) {
-      pages.add('/debug');
-    } else {
-      pages.add('/laundry');
-    }
 
     return BottomNavigationBar(
       currentIndex: itemIndex,
@@ -28,7 +23,7 @@ class NavBar extends StatelessWidget {
         }
         Get.toNamed(pages[index]);
       },
-      items: getNavBarItems(debug),
+      items: navBarItems,
       selectedItemColor:
           Theme.of(context).bottomNavigationBarTheme.selectedItemColor,
       unselectedItemColor:
@@ -36,25 +31,13 @@ class NavBar extends StatelessWidget {
     );
   }
 
-  List<BottomNavigationBarItem> getNavBarItems(bool debug) {
-    List<BottomNavigationBarItem> items = [
-      const BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-      const BottomNavigationBarItem(
-          icon: Icon(Icons.door_sliding_rounded), label: "Closet"),
-      const BottomNavigationBarItem(
-          icon: Icon(Icons.shopping_basket), label: "Laundry Basket"),
-    ];
-    if (debug) {
-      items.add(
-        const BottomNavigationBarItem(
-            icon: Icon(Icons.bug_report), label: "Debug Page"),
-      );
-    } else {
-      items.add(
-        const BottomNavigationBarItem(
-            icon: Icon(Icons.local_laundry_service), label: "At Wash"),
-      );
-    }
-    return items;
-  }
+  static const navBarItems = [
+    BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+    BottomNavigationBarItem(
+        icon: Icon(Icons.door_sliding_rounded), label: "Closet"),
+    BottomNavigationBarItem(
+        icon: Icon(Icons.shopping_basket), label: "Laundry Basket"),
+    BottomNavigationBarItem(
+        icon: Icon(Icons.local_laundry_service), label: "At Wash"),
+  ];
 }

@@ -76,7 +76,7 @@ class _DebugPageState extends State<DebugPage> {
                       ButtonBar(
                         children: [
                           OutlinedButton(
-                            child: const Text('Move to Closet'),
+                            child: const Text('Closet'),
                             onPressed: () async {
                               // Use the updateState on database
                               await dbHelper.updateState(
@@ -94,7 +94,7 @@ class _DebugPageState extends State<DebugPage> {
                             },
                           ),
                           OutlinedButton(
-                            child: const Text('Move to Basket'),
+                            child: const Text('Basket'),
                             onPressed: () async {
                               // Use the updateState on database
                               await dbHelper.updateState(
@@ -112,7 +112,7 @@ class _DebugPageState extends State<DebugPage> {
                             },
                           ),
                           OutlinedButton(
-                            child: const Text('Send to Laundry'),
+                            child: const Text('Laundry'),
                             onPressed: () async {
                               // Use the updateState on database
                               await dbHelper.updateState(

@@ -46,6 +46,13 @@ class _HomePageState extends State<HomePage> {
               },
               child: const Text('Purge DB'),
             ),
+            // Add a button to toggle debug page
+            OutlinedButton(
+              onPressed: () {
+                Get.toNamed("/debug");
+              },
+              child: const Text('Debug Page'),
+            ),
           ],
         ),
       ),

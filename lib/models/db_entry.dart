@@ -1,10 +1,10 @@
-class ItemCard {
+class DbEntry {
   final int id;
   final String name;
   final int state;
   final String imagePath;
 
-  ItemCard({
+  DbEntry({
     required this.id,
     required this.name,
     required this.state,
@@ -12,7 +12,7 @@ class ItemCard {
   });
 
   // Make a factory constructor to create a Card from a map
-  factory ItemCard.fromMap(Map<String, dynamic> json) => ItemCard(
+  factory DbEntry.fromMap(Map<String, dynamic> json) => DbEntry(
         id: json["id"],
         name: json["name"],
         state: json["state"],

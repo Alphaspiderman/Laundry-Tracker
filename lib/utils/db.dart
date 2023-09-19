@@ -40,7 +40,7 @@ class DatabaseHelper {
     );
   }
 
-  Future<void> insertData(ItemCard data, File imageFile) async {
+  Future<void> insertData(DbEntry data, File imageFile) async {
     // Save image to local directory
     final appDir = await getApplicationDocumentsDirectory();
     final imagePath = join(appDir.path, 'images', '${data.imagePath}.png');
@@ -56,18 +56,18 @@ class DatabaseHelper {
     });
   }
 
-  Future<List<ItemCard>> fetchData() async {
+  Future<List<DbEntry>> fetchData() async {
     Database db = await database;
     // Query for all entries
     final List<Map<String, dynamic>> maps = await db.query('clothes');
 
     return List.generate(maps.length, (index) {
       print(maps[index]);
-      return ItemCard.fromMap(maps[index]);
+      return DbEntry.fromMap(maps[index]);
     });
   }
 
-  Future<List<ItemCard>> fetchDataByState(States state) async {
+  Future<List<DbEntry>> fetchDataByState(States state) async {
     int dbState = state.index;
     Database db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
@@ -77,11 +77,11 @@ class DatabaseHelper {
     );
 
     return List.generate(maps.length, (index) {
-      return ItemCard.fromMap(maps[index]);
+      return DbEntry.fromMap(maps[index]);
     });
   }
 
-  Future<void> updateData(ItemCard data) async {
+  Future<void> updateData(DbEntry data) async {
     Database db = await database;
     await db.update(
       'clothes',

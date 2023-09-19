@@ -54,7 +54,7 @@ class _DebugPageState extends State<DebugPage> {
           } else {
             // Display details about data
             // return Text('Data: ${snapshot.data}');
-            List<ItemCard> dataList = snapshot.data as List<ItemCard>;
+            List<DbEntry> dataList = snapshot.data as List<DbEntry>;
             // Display the items in list as cards
             return ListView.builder(
               itemCount: dataList.length,

@@ -76,7 +76,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
             ElevatedButton(
               onPressed: () async {
                 if (imageFile != null) {
-                  ItemCard capturedData = ItemCard(
+                  DbEntry capturedData = DbEntry(
                     id: 0,
                     name: _nameController.text,
                     state: itemstate,

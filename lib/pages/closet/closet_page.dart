@@ -1,7 +1,7 @@
-import 'dart:io';
 import 'package:clothes_tracker/models/state.dart';
 import 'package:clothes_tracker/models/status.dart';
 import 'package:clothes_tracker/navigation/navgation_bar.dart';
+import 'package:clothes_tracker/ui/display_card.dart';
 import 'package:clothes_tracker/views/create_entry.dart';
 import 'package:clothes_tracker/ui/app_bar.dart';
 import 'package:clothes_tracker/utils/db.dart';
@@ -23,6 +23,38 @@ class _ClosetPageState extends State<ClosetPage> {
   void initState() {
     super.initState();
     dbHelper.initDatabase();
+  }
+
+  void moveToBasket(int id) async {
+    // Use the updateState on database
+    await dbHelper.updateState(
+      id,
+      States.basket,
+    );
+    // Show a notification
+    Get.snackbar(
+      'Success',
+      'Item moved to Basket',
+      duration: const Duration(seconds: 3),
+    );
+    // Rebuild the view
+    setState(() {});
+  }
+
+  void moveToLaundry(int id) async {
+    // Use the updateState on database
+    await dbHelper.updateState(
+      id,
+      States.wash,
+    );
+    // Show a notification
+    Get.snackbar(
+      'Success',
+      'Item moved to Laundry',
+      duration: const Duration(seconds: 3),
+    );
+    // Rebuild the view
+    setState(() {});
   }
 
   @override
@@ -69,71 +101,12 @@ class _ClosetPageState extends State<ClosetPage> {
             return ListView.builder(
               itemCount: dataList.length,
               itemBuilder: (context, index) {
-                // Create a card with the image and name
-                return Card(
-                  child: Column(
-                    children: [
-                      ListTile(
-                        title: Text(dataList[index].name),
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.75,
-                        child: Image.file(
-                          File(dataList[index].imagePath),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      ButtonBar(
-                        children: [
-                          OutlinedButton(
-                            child: const Text('Move to Basket'),
-                            onPressed: () async {
-                              // Use the updateState on database
-                              await dbHelper.updateState(
-                                dataList[index].id,
-                                States.basket,
-                              );
-                              // Show a notification
-                              Get.snackbar(
-                                'Success',
-                                'Item moved to basket',
-                                duration: const Duration(seconds: 3),
-                              );
-                              // Rebuild the view
-                              setState(() {});
-                            },
-                          ),
-                          OutlinedButton(
-                            child: const Text('Send to Laundry'),
-                            onPressed: () async {
-                              // Use the updateState on database
-                              await dbHelper.updateState(
-                                dataList[index].id,
-                                States.wash,
-                              );
-                              // Show a notification
-                              Get.snackbar(
-                                'Success',
-                                'Item moved to Laundry',
-                                duration: const Duration(seconds: 3),
-                              );
-                              // Rebuild the view
-                              setState(() {});
-                            },
-                          )
-                        ],
-                      )
-                    ],
-                  ),
+                // return a display card
+                return DisplayCard(
+                  data: dataList[index],
+                  onFirstButtonPressed: moveToBasket,
+                  onSecondButtonPressed: moveToLaundry,
                 );
-
-                // return Card(
-                //   child: ListTile(
-                //     leading: Image.file(File(dataList[index].imagePath)),
-                //     title: Text(dataList[index].name),
-                //     subtitle: Text(dataList[index].state.toString()),
-                //   ),
-                // );
               },
             );
           }

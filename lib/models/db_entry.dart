@@ -1,7 +1,9 @@
+import 'package:clothes_tracker/models/state.dart';
+
 class DbEntry {
   final int id;
   final String name;
-  final int state;
+  final States state;
   final String imagePath;
 
   DbEntry({
@@ -15,7 +17,7 @@ class DbEntry {
   factory DbEntry.fromMap(Map<String, dynamic> json) => DbEntry(
         id: json["id"],
         name: json["name"],
-        state: json["state"],
+        state: States.values[json["state"]],
         imagePath: json["image_path"],
       );
 

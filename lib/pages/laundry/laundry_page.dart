@@ -24,6 +24,15 @@ class _LaundryPageState extends State<LaundryPage> {
     dbHelper.initDatabase();
   }
 
+  void _hasData() {
+    Get.snackbar(
+      'Success',
+      'Data saved successfully',
+      duration: const Duration(seconds: 2),
+    );
+    setState(() {});
+  }
+
   void moveToCloset(int id) async {
     // Use the updateState on database
     await dbHelper.updateState(
@@ -66,8 +75,7 @@ class _LaundryPageState extends State<LaundryPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           // Create a DB entry taking data from user input
-          Get.to(() => const DataCaptureScreen());
-          setState(() {});
+          Get.to(() => DataCaptureScreen(hasData: _hasData));
         },
         child: const Icon(Icons.add),
       ),

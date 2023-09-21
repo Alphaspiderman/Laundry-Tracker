@@ -24,6 +24,15 @@ class _DebugPageState extends State<DebugPage> {
     dbHelper.initDatabase();
   }
 
+  void _hasData() {
+    Get.snackbar(
+      'Success',
+      'Data saved successfully',
+      duration: const Duration(seconds: 2),
+    );
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,8 +43,7 @@ class _DebugPageState extends State<DebugPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           // Create a DB entry taking data from user input
-          Get.to(() => const DataCaptureScreen());
-          setState(() {});
+          Get.to(() => DataCaptureScreen(hasData: _hasData));
         },
         child: const Icon(Icons.add),
       ),

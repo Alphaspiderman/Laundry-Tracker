@@ -1,5 +1,4 @@
 import 'package:clothes_tracker/models/state.dart';
-import 'package:clothes_tracker/models/status.dart';
 import 'package:clothes_tracker/navigation/navgation_bar.dart';
 import 'package:clothes_tracker/ui/display_card.dart';
 import 'package:clothes_tracker/views/create_entry.dart';
@@ -23,6 +22,15 @@ class _ClosetPageState extends State<ClosetPage> {
   void initState() {
     super.initState();
     dbHelper.initDatabase();
+  }
+
+  void _hasData() {
+    Get.snackbar(
+      'Success',
+      'Data saved successfully',
+      duration: const Duration(seconds: 2),
+    );
+    setState(() {});
   }
 
   void moveToBasket(int id) async {
@@ -67,18 +75,7 @@ class _ClosetPageState extends State<ClosetPage> {
       // Add a FAB to create DB entry
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          // Create a DB entry taking data from user input
-          Status snack = await Get.to(() => const DataCaptureScreen());
-          switch (snack) {
-            case Status.success:
-              Get.snackbar(
-                'Success',
-                'Data saved successfully',
-              );
-              break;
-            default:
-          }
-          setState(() {});
+          Get.to(() => DataCaptureScreen(hasData: _hasData));
         },
         child: const Icon(Icons.add),
       ),

@@ -6,9 +6,17 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
 class ImagePickerWidget extends StatelessWidget {
-  final Function(String) onDataReceived;
+  final Function(String, String) onDataReceived;
 
   const ImagePickerWidget({super.key, required this.onDataReceived});
+
+  String getSafe() {
+    var now = DateTime.now();
+    String safeString = now.microsecond.toString() +
+        now.second.toString() +
+        now.minute.toString();
+    return safeString;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,17 +24,36 @@ class ImagePickerWidget extends StatelessWidget {
       onPressed: () async {
         XFile? imageFile = await pickImage(context);
         if (imageFile != null) {
-          // Save the image with a random name
+          // Get the application directory
           final appDir = await getApplicationDocumentsDirectory();
-          print(appDir.path.toString());
-          final imageName = '${DateTime.now()}.png';
-          final finalImagePath = join(appDir.path, 'images', imageName);
+
+          // Create a unique image name
+          String safeString = getSafe();
+          String imageName = '${imageFile.path.hashCode}-$safeString.png';
+
           // Create folders if do not exist
-          await Directory(join(appDir.path, 'images')).create(recursive: true);
-          // Move file
-          await imageFile.saveTo(finalImagePath);
-          print(finalImagePath.toString());
-          onDataReceived(finalImagePath);
+          await Directory(join(appDir.path, 'temp')).create(recursive: true);
+          await Directory(join(appDir.path, 'iamges')).create(recursive: true);
+
+          // Create the path for checking
+          String finalImagePath = join(appDir.path, 'images', imageName);
+
+          // Make sure the file does not exist in final location
+          var file = File(finalImagePath);
+          // If the file exists, create a new name
+          if (await file.exists()) {
+            String safeString = DateTime.now().microsecond.toString() +
+                DateTime.now().second.toString() +
+                DateTime.now().minute.toString();
+            imageName = '${imageFile.path.hashCode}-$safeString.png';
+          }
+
+          // Create the final paths for the temp and final locations
+          String tempImagePath = join(appDir.path, 'temp', imageName);
+
+          // Move file to temp location
+          await imageFile.saveTo(tempImagePath);
+          onDataReceived(appDir.path, imageName);
         }
       },
       child: const Text('Pick Image'),

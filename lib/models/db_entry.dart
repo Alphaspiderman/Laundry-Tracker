@@ -18,7 +18,7 @@ class DbEntry {
         id: json["id"],
         name: json["name"],
         state: States.values[json["state"]],
-        imagePath: json["image_path"],
+        imagePath: json["prepend"].toString() + json["image_path"].toString(),
       );
 
   // Make a method to convert a Card to a map

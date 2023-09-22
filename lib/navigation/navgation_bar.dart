@@ -18,10 +18,11 @@ class NavBar extends StatelessWidget {
     return BottomNavigationBar(
       currentIndex: itemIndex,
       onTap: (index) {
-        if (itemIndex != 0) {
+        if (index == 0) {
           Get.back();
+        } else {
+          Get.offNamedUntil(pages[index], ModalRoute.withName('/home'));
         }
-        Get.toNamed(pages[index]);
       },
       items: navBarItems,
       selectedItemColor:

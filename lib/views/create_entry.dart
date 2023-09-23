@@ -79,7 +79,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                   DbEntry capturedData = DbEntry(
                     id: 0,
                     name: _nameController.text,
-                    state: itemstate,
+                    state: States.values[itemstate],
                     imagePath: imageFile!.path,
                   );
                   await dbHelper.insertData(capturedData, imageFile!);

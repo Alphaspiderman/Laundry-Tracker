@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:clothes_tracker/models/state.dart';
-import 'package:clothes_tracker/navigation/navgation_bar.dart';
+// import 'package:clothes_tracker/navigation/navgation_bar.dart';
 import 'package:clothes_tracker/views/create_entry.dart';
 import 'package:clothes_tracker/ui/app_bar.dart';
 import 'package:clothes_tracker/utils/db.dart';
@@ -12,6 +12,7 @@ class DebugPage extends StatefulWidget {
   const DebugPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _DebugPageState createState() => _DebugPageState();
 }
 
@@ -47,7 +48,7 @@ class _DebugPageState extends State<DebugPage> {
         },
         child: const Icon(Icons.add),
       ),
-      bottomNavigationBar: const NavBar(itemIndex: 3),
+      // bottomNavigationBar: const NavBar(itemIndex: 3),
       body: FutureBuilder(
         future: dbHelper.fetchData(),
         builder: (context, snapshot) {

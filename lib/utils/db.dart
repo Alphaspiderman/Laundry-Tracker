@@ -9,10 +9,11 @@ import 'package:clothes_tracker/models/db_entry.dart';
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
   static Database? _database;
+  static Directory? appDir;
 
   Future<Database> get database async {
+    appDir = await getApplicationDocumentsDirectory();
     if (_database != null) return _database!;
-
     await initDatabase();
     return _database!;
   }
@@ -42,17 +43,21 @@ class DatabaseHelper {
 
   Future<void> insertData(DbEntry data, File imageFile) async {
     // Save image to local directory
-    final appDir = await getApplicationDocumentsDirectory();
-    final imagePath = join(appDir.path, 'images', '${data.imagePath}.png');
+    final imagePath = join(appDir!.path, 'images', data.imagePath);
     await imageFile.copy(imagePath);
+    // Delete the temp image
+    await imageFile.delete();
+
+    // Clean image path
+    final imagePathClean = imagePath.replaceAll(appDir!.path, '');
 
     Database db = await database;
 
     // Insert data into the database
     await db.insert('clothes', {
       'name': data.name,
-      'state': data.state,
-      'image_path': imagePath,
+      'state': data.state.index,
+      'image_path': imagePathClean,
     });
   }
 
@@ -61,10 +66,7 @@ class DatabaseHelper {
     // Query for all entries
     final List<Map<String, dynamic>> maps = await db.query('clothes');
 
-    return List.generate(maps.length, (index) {
-      print(maps[index]);
-      return DbEntry.fromMap(maps[index]);
-    });
+    return generateList(maps);
   }
 
   Future<List<DbEntry>> fetchDataByState(States state) async {
@@ -76,30 +78,7 @@ class DatabaseHelper {
       whereArgs: [dbState],
     );
 
-    return List.generate(maps.length, (index) {
-      return DbEntry.fromMap(maps[index]);
-    });
-  }
-
-  Future<void> updateData(DbEntry data) async {
-    Database db = await database;
-    await db.update(
-      'clothes',
-      data.toMap(),
-      where: 'id = ?',
-      whereArgs: [data.id],
-    );
-  }
-
-  // Update Image Path
-  Future<void> updateImagePath(String id, String imagePath) async {
-    Database db = await database;
-    await db.update(
-      'clothes',
-      {'image_path': imagePath},
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    return generateList(maps);
   }
 
   // Update State
@@ -117,6 +96,15 @@ class DatabaseHelper {
   // Delete a card
   Future<void> deleteData(String id) async {
     Database db = await database;
+    // Get the data to delete
+    final data = await db.query(
+      'clothes',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    // Convert to DbEntry
+    final dataEntry = DbEntry.fromMap(data[0]);
+    // Delete the data
     await db.delete(
       'clothes',
       where: 'id = ?',
@@ -124,7 +112,7 @@ class DatabaseHelper {
     );
 
     final appDir = await getApplicationDocumentsDirectory();
-    final imagePath = join(appDir.path, 'images', '$id.png');
+    final imagePath = join(appDir.path, '${dataEntry.imagePath}.png');
     await File(imagePath).delete();
   }
 
@@ -132,5 +120,19 @@ class DatabaseHelper {
   Future<void> purgeData() async {
     Database db = await database;
     await db.delete('clothes');
+    final imagePath = join(appDir!.path, 'images');
+    // Delete the images directory
+    await Directory(imagePath).delete(recursive: true);
+    // Recreate the images directory
+    await Directory(imagePath).create();
+  }
+
+  List<DbEntry> generateList(List<Map<String, dynamic>> maps) {
+    return List.generate(maps.length, (index) {
+      // Create a editable copy of the map
+      var map = Map<String, dynamic>.from(maps[index]);
+      map.addEntries([MapEntry('prepend', appDir!.path)]);
+      return DbEntry.fromMap(map);
+    });
   }
 }

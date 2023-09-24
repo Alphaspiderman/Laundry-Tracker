@@ -1,31 +1,36 @@
 import 'dart:io';
-
 import 'package:clothes_tracker/models/db_entry.dart';
 import 'package:clothes_tracker/models/state.dart';
-import 'package:clothes_tracker/models/status.dart';
 import 'package:clothes_tracker/utils/db.dart';
 import 'package:clothes_tracker/views/imgpicker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:path/path.dart';
 
 class DataCaptureScreen extends StatefulWidget {
-  const DataCaptureScreen({super.key});
+  // Get a callback when data is saved
+  final Function() hasData;
+  const DataCaptureScreen({super.key, required this.hasData});
 
   @override
   _DataCaptureScreenState createState() => _DataCaptureScreenState();
 }
 
 class _DataCaptureScreenState extends State<DataCaptureScreen> {
+  void hasData() {
+    widget.hasData();
+  }
+
   final DatabaseHelper dbHelper = Get.find();
   final TextEditingController _nameController = TextEditingController();
   int itemstate = 0;
   String? imagePath;
   File? imageFile;
 
-  void _receiveImagePath(String data) {
+  void _receiveImageName(String basePath, String imageName) {
     setState(() {
-      imagePath = data;
-      imageFile = File(imagePath!);
+      imagePath = imageName;
+      imageFile = File(join(basePath, 'temp', imageName));
     });
   }
 
@@ -43,25 +48,25 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
               controller: _nameController,
               decoration: const InputDecoration(labelText: 'Name'),
             ),
-            ImagePickerWidget(onDataReceived: _receiveImagePath),
+            ImagePickerWidget(onDataReceived: _receiveImageName),
             const SizedBox(height: 16.0),
             // Display the image if it exists but limit the size
             if (imagePath != null)
               SizedBox(
                 height: 200,
-                child: Image.file(File(imagePath!)),
+                child: Image.file(imageFile!),
               ),
             DropdownButtonFormField(
-              value: States.basket,
+              value: States.closet,
               decoration: const InputDecoration(labelText: 'State'),
               items: const [
                 DropdownMenuItem(
-                  value: States.basket,
-                  child: Text('Basket'),
-                ),
-                DropdownMenuItem(
                   value: States.closet,
                   child: Text('Closet'),
+                ),
+                DropdownMenuItem(
+                  value: States.basket,
+                  child: Text('Basket'),
                 ),
                 DropdownMenuItem(
                   value: States.wash,
@@ -80,10 +85,11 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                     id: 0,
                     name: _nameController.text,
                     state: States.values[itemstate],
-                    imagePath: imageFile!.path,
+                    imagePath: imagePath!,
                   );
                   await dbHelper.insertData(capturedData, imageFile!);
-                  Get.back(result: Status.success, closeOverlays: true);
+                  hasData();
+                  Get.back(closeOverlays: true);
                 }
               },
               child: const Text('Save Data'),

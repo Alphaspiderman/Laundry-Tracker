@@ -6,8 +6,9 @@ class DBController extends GetxController {
   late DatabaseHelper _db;
 
   // Initialize your class
-  void initClass() {
+  void initClass() async {
     _db = DatabaseHelper();
+    await _db.initClass();
   }
 
   DatabaseHelper get db => _db;

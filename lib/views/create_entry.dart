@@ -13,6 +13,7 @@ class DataCaptureScreen extends StatefulWidget {
   const DataCaptureScreen({super.key, required this.hasData});
 
   @override
+  // ignore: library_private_types_in_public_api
   _DataCaptureScreenState createState() => _DataCaptureScreenState();
 }
 

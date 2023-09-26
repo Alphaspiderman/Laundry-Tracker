@@ -12,6 +12,7 @@ class ClosetPage extends StatefulWidget {
   const ClosetPage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _ClosetPageState createState() => _ClosetPageState();
 }
 

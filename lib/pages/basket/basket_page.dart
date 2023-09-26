@@ -17,13 +17,7 @@ class BasketPage extends StatefulWidget {
 }
 
 class _BasketPageState extends State<BasketPage> {
-  final dbHelper = DatabaseHelper();
-
-  @override
-  void initState() {
-    super.initState();
-    dbHelper.initDatabase();
-  }
+  final DatabaseHelper dbHelper = Get.find();
 
   void _hasData() {
     Get.snackbar(

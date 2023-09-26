@@ -17,13 +17,7 @@ class LaundryPage extends StatefulWidget {
 }
 
 class _LaundryPageState extends State<LaundryPage> {
-  final dbHelper = DatabaseHelper();
-
-  @override
-  void initState() {
-    super.initState();
-    dbHelper.initDatabase();
-  }
+  final DatabaseHelper dbHelper = Get.find();
 
   void _hasData() {
     Get.snackbar(

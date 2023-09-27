@@ -1,8 +1,4 @@
-// Make a custom card holding an image and 2 buttons
-//
-// Create a new file lib/ui/item_card.dart and add the following code:
 import 'dart:io';
-
 import 'package:clothes_tracker/models/db_entry.dart';
 import 'package:clothes_tracker/models/state.dart';
 import 'package:flutter/material.dart';
@@ -12,20 +8,25 @@ class DisplayCard extends StatelessWidget {
   final DbEntry data;
   final Function(int) onFirstButtonPressed;
   final Function(int) onSecondButtonPressed;
+  final Function(int)? onThirdButtonPressed;
+  final Function(int) onDelete;
 
   const DisplayCard({
     Key? key,
     required this.data,
     required this.onFirstButtonPressed,
     required this.onSecondButtonPressed,
+    required this.onDelete,
+    this.onThirdButtonPressed,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> buttons = generateButtons();
+    // Check if onThirdButtonPressed is null
+    bool check = onThirdButtonPressed == null;
+    List<Widget> buttons = check ? generateButtons() : generateButtonsDebug();
     return Card(
       child: Column(
-        // mainAxisSize: MainAxisSize.min,
         children: [
           ListTile(
             title: Text(data.name),
@@ -38,7 +39,7 @@ class DisplayCard extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onLongPress: () {
+            onTap: () {
               Get.dialog(
                 Dialog(
                   child: Image.file(
@@ -66,6 +67,40 @@ class DisplayCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  List<Widget> generateButtonsDebug() {
+    // Change text options based on data state
+    List<Widget> buttons = [];
+    // Add the first button
+    buttons.add(
+      OutlinedButton(
+        onPressed: () => onFirstButtonPressed(data.id),
+        child: const Text('Closet'),
+      ),
+    );
+    // Add the second button
+    buttons.add(
+      OutlinedButton(
+        onPressed: () => onSecondButtonPressed(data.id),
+        child: const Text('Basket'),
+      ),
+    );
+    // Add the third Button
+    buttons.add(
+      OutlinedButton(
+        onPressed: () => onSecondButtonPressed(data.id),
+        child: const Text('Laundry'),
+      ),
+    );
+    buttons.add(IconButton(
+      onPressed: () async {
+        await onDelete(data.id);
+      },
+      icon: const Icon(Icons.delete_outline_rounded),
+      color: Colors.red,
+    ));
+    return buttons;
   }
 
   List<Widget> generateButtons() {
@@ -98,6 +133,13 @@ class DisplayCard extends StatelessWidget {
         child: firstText,
       ),
     );
+    buttons.add(IconButton(
+      onPressed: () async {
+        await onDelete(data.id);
+      },
+      icon: const Icon(Icons.delete_outline_rounded),
+      color: Colors.red,
+    ));
     // Add the second button
     buttons.add(
       OutlinedButton(

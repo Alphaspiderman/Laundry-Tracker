@@ -1,6 +1,5 @@
-import 'dart:io';
 import 'package:clothes_tracker/models/state.dart';
-// import 'package:clothes_tracker/navigation/navgation_bar.dart';
+import 'package:clothes_tracker/ui/display_card.dart';
 import 'package:clothes_tracker/views/create_entry.dart';
 import 'package:clothes_tracker/ui/app_bar.dart';
 import 'package:clothes_tracker/utils/db.dart';
@@ -34,6 +33,130 @@ class _DebugPageState extends State<DebugPage> {
     setState(() {});
   }
 
+  Future<void> _deleteEntry(int id) async {
+    Get.dialog(
+      Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: Container(
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(20),
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Material(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Column(
+                      children: [
+                        const Text(
+                          "Confirm Action",
+                          style: TextStyle(fontSize: 26),
+                        ),
+                        const SizedBox(height: 20),
+                        const Text(
+                          "Please confirm if you want to remove the following entry",
+                          style: TextStyle(fontSize: 16),
+                        ),
+                        const SizedBox(height: 20),
+                        //Buttons
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  Get.back();
+                                },
+                                child: const Text(
+                                  'NO',
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: ElevatedButton(
+                                onPressed: () async {
+                                  final DatabaseHelper dbHelper = Get.find();
+                                  await dbHelper.deleteData(id);
+                                  Get.back();
+                                  Get.snackbar(
+                                    "Deletion",
+                                    "Entry Deleted!",
+                                  );
+                                  setState(() {});
+                                },
+                                child: const Text(
+                                  'YES',
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void moveToCloset(int id) async {
+    // Use the updateState on database
+    await dbHelper.updateState(
+      id,
+      States.closet,
+    );
+    // Show a notification
+    Get.snackbar(
+      'Success',
+      'Item moved to Closet',
+      duration: const Duration(seconds: 3),
+    );
+    // Rebuild the view
+    setState(() {});
+  }
+
+  void moveToBasket(int id) async {
+    // Use the updateState on database
+    await dbHelper.updateState(
+      id,
+      States.basket,
+    );
+    // Show a notification
+    Get.snackbar(
+      'Success',
+      'Item moved to Basket',
+      duration: const Duration(seconds: 3),
+    );
+    // Rebuild the view
+    setState(() {});
+  }
+
+  void moveToLaundry(int id) async {
+    // Use the updateState on database
+    await dbHelper.updateState(
+      id,
+      States.wash,
+    );
+    // Show a notification
+    Get.snackbar(
+      'Success',
+      'Item moved to Laundry',
+      duration: const Duration(seconds: 3),
+    );
+    // Rebuild the view
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,7 +171,6 @@ class _DebugPageState extends State<DebugPage> {
         },
         child: const Icon(Icons.add),
       ),
-      // bottomNavigationBar: const NavBar(itemIndex: 3),
       body: FutureBuilder(
         future: dbHelper.fetchData(),
         builder: (context, snapshot) {
@@ -68,89 +190,15 @@ class _DebugPageState extends State<DebugPage> {
             return ListView.builder(
               itemCount: dataList.length,
               itemBuilder: (context, index) {
-                // Create a card with the image and name
-                return Card(
-                  child: Column(
-                    children: [
-                      ListTile(
-                        title: Text(dataList[index].name),
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.75,
-                        child: Image.file(
-                          File(dataList[index].imagePath),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      ButtonBar(
-                        children: [
-                          OutlinedButton(
-                            child: const Text('Closet'),
-                            onPressed: () async {
-                              // Use the updateState on database
-                              await dbHelper.updateState(
-                                dataList[index].id,
-                                States.closet,
-                              );
-                              // Show a notification
-                              Get.snackbar(
-                                'Success',
-                                'Item moved to Closet',
-                                duration: const Duration(seconds: 3),
-                              );
-                              // Rebuild the view
-                              setState(() {});
-                            },
-                          ),
-                          OutlinedButton(
-                            child: const Text('Basket'),
-                            onPressed: () async {
-                              // Use the updateState on database
-                              await dbHelper.updateState(
-                                dataList[index].id,
-                                States.basket,
-                              );
-                              // Show a notification
-                              Get.snackbar(
-                                'Success',
-                                'Item moved to Basket',
-                                duration: const Duration(seconds: 3),
-                              );
-                              // Rebuild the view
-                              setState(() {});
-                            },
-                          ),
-                          OutlinedButton(
-                            child: const Text('Laundry'),
-                            onPressed: () async {
-                              // Use the updateState on database
-                              await dbHelper.updateState(
-                                dataList[index].id,
-                                States.wash,
-                              );
-                              // Show a notification
-                              Get.snackbar(
-                                'Success',
-                                'Item moved to Laundry',
-                                duration: const Duration(seconds: 3),
-                              );
-                              // Rebuild the view
-                              setState(() {});
-                            },
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
+                return DisplayCard(
+                  data: dataList[index],
+                  onFirstButtonPressed: moveToBasket,
+                  onSecondButtonPressed: moveToCloset,
+                  onDelete: (int id) async {
+                    await _deleteEntry(id);
+                  },
+                  onThirdButtonPressed: moveToLaundry,
                 );
-
-                // return Card(
-                //   child: ListTile(
-                //     leading: Image.file(File(dataList[index].imagePath)),
-                //     title: Text(dataList[index].name),
-                //     subtitle: Text(dataList[index].state.toString()),
-                //   ),
-                // );
               },
             );
           }

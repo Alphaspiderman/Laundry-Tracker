@@ -33,7 +33,7 @@ class ImagePickerWidget extends StatelessWidget {
 
           // Create folders if do not exist
           await Directory(join(appDir.path, 'temp')).create(recursive: true);
-          await Directory(join(appDir.path, 'iamges')).create(recursive: true);
+          await Directory(join(appDir.path, 'images')).create(recursive: true);
 
           // Create the path for checking
           String finalImagePath = join(appDir.path, 'images', imageName);

@@ -17,13 +17,7 @@ class ClosetPage extends StatefulWidget {
 }
 
 class _ClosetPageState extends State<ClosetPage> {
-  final dbHelper = DatabaseHelper();
-
-  @override
-  void initState() {
-    super.initState();
-    dbHelper.initDatabase();
-  }
+  final DatabaseHelper dbHelper = Get.find();
 
   void _hasData() {
     Get.snackbar(

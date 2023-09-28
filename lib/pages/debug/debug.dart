@@ -39,67 +39,58 @@ class _DebugPageState extends State<DebugPage> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40),
-            child: Container(
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(
-                  Radius.circular(20),
-                ),
-              ),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Material(
               child: Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Material(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: Column(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 25.0,
+                  vertical: 30,
+                ),
+                child: Column(
+                  children: [
+                    const Text(
+                      "Confirm Action",
+                      style: TextStyle(fontSize: 26),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      "Please confirm if you want to remove the following entry",
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
                       children: [
-                        const Text(
-                          "Confirm Action",
-                          style: TextStyle(fontSize: 26),
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          "Please confirm if you want to remove the following entry",
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        const SizedBox(height: 20),
-                        //Buttons
-                        Row(
-                          children: [
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  Get.back();
-                                },
-                                child: const Text(
-                                  'NO',
-                                ),
-                              ),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Get.back();
+                            },
+                            child: const Text(
+                              'NO',
                             ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: () async {
-                                  final DatabaseHelper dbHelper = Get.find();
-                                  await dbHelper.deleteData(id);
-                                  Get.back();
-                                  Get.snackbar(
-                                    "Deletion",
-                                    "Entry Deleted!",
-                                  );
-                                  setState(() {});
-                                },
-                                child: const Text(
-                                  'YES',
-                                ),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              final DatabaseHelper dbHelper = Get.find();
+                              await dbHelper.deleteData(id);
+                              Get.back();
+                              Get.snackbar(
+                                "Deletion",
+                                "Entry Deleted!",
+                              );
+                              setState(() {});
+                            },
+                            child: const Text(
+                              'YES',
+                            ),
+                          ),
+                        ),
                       ],
                     ),
-                  ),
+                  ],
                 ),
               ),
             ),

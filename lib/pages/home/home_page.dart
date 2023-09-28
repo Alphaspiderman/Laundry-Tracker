@@ -48,62 +48,53 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40),
-              child: Container(
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(20),
-                  ),
-                ),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Material(
                 child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Material(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Column(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 25.0,
+                    vertical: 30,
+                  ),
+                  child: Column(
+                    children: [
+                      const Text(
+                        "Warning",
+                        style: TextStyle(fontSize: 26),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text(
+                        "Local data will be removed before import is attempted!! \nIncase of failed import, exisiting data will not be restored",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
                         children: [
-                          const Text(
-                            "Warning",
-                            style: TextStyle(fontSize: 26),
-                          ),
-                          const SizedBox(height: 20),
-                          const Text(
-                            "Local data will be removed before import is attempted!! \nIncase of failed import, exisiting data will not be restored",
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          const SizedBox(height: 20),
-                          //Buttons
-                          Row(
-                            children: [
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    Get.back();
-                                  },
-                                  child: const Text(
-                                    'NO',
-                                  ),
-                                ),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Get.back();
+                              },
+                              child: const Text(
+                                'NO',
                               ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed: () async {
-                                    await dbHelper.importData(File(path));
-                                    Get.back();
-                                    Get.snackbar("Import", "Data Imported!");
-                                  },
-                                  child: const Text(
-                                    'YES',
-                                  ),
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                await dbHelper.importData(File(path));
+                                Get.snackbar("Import", "Data Imported!");
+                                Get.back();
+                              },
+                              child: const Text(
+                                'YES',
+                              ),
+                            ),
+                          ),
                         ],
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),

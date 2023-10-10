@@ -122,12 +122,6 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            OutlinedButton(
-              onPressed: () {
-                Get.snackbar("Test", "Hello!");
-              },
-              child: const Text('Trigger Snack'),
-            ),
             // Add a button to purge the DB
             OutlinedButton(
               onPressed: () async {

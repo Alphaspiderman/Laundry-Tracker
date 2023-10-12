@@ -108,8 +108,6 @@ class _HomePageState extends State<HomePage> {
   // Function to export all data of the app as ZIP
   void exportData() async {
     await dbHelper.exportData();
-
-    Get.snackbar("Export", "Data Exported!");
   }
 
   @override

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:clothes_tracker/models/state.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_archive/flutter_archive.dart';
+import 'package:get/get.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -241,6 +242,7 @@ class DatabaseHelper {
     await zipFile.copy(saveFile.path);
     // Delete the temp file
     await zipFile.delete();
+    Get.snackbar("Export", "Data Exported!");
   }
 
   // Purge the database

@@ -1,16 +1,14 @@
-# clothes_tracker
+# Clothes Tracker
 
-A new Flutter project.
+A basic app to manually keep track of Laundry.
 
-## Getting Started
+It can be in 3 main states
 
-This project is a starting point for a Flutter application.
+1. In the Closet and Ready to Use
+2. In the Laundry Basket
+3. At Laundry / In the wash
 
-A few resources to get you started if this is your first Flutter project:
+## Built Using
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+![Flutter](https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white)
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.

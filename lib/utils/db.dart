@@ -168,6 +168,12 @@ class DatabaseHelper {
       final saveImagePath = appDir!.path + data.imagePath;
       await File(importImagePath).copy(saveImagePath);
     }
+
+    // Delete the import directory
+    await importDir.delete(recursive: true);
+
+    Get.back();
+    Get.snackbar("Import", "Data Imported!");
   }
 
   // Export data as a ZIP
@@ -250,8 +256,11 @@ class DatabaseHelper {
     Database db = await database;
     await db.delete('clothes');
     final imagePath = join(appDir!.path, 'images');
-    // Delete the images directory
-    await Directory(imagePath).delete(recursive: true);
+    // Check if images directory exists
+    if (Directory(imagePath).existsSync()) {
+      // Delete the images directory
+      await Directory(imagePath).delete(recursive: true);
+    }
     // Recreate the images directory
     await Directory(imagePath).create();
   }

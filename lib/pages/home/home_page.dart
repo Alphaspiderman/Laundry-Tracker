@@ -84,8 +84,6 @@ class _HomePageState extends State<HomePage> {
                             child: ElevatedButton(
                               onPressed: () async {
                                 await dbHelper.importData(File(path));
-                                Get.snackbar("Import", "Data Imported!");
-                                Get.back();
                               },
                               child: const Text(
                                 'YES',

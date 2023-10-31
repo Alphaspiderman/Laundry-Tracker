@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:clothes_tracker/navigation/navgation_bar.dart';
 import 'package:clothes_tracker/ui/app_bar.dart';
 import 'package:clothes_tracker/utils/db.dart';
@@ -24,6 +23,15 @@ class _HomePageState extends State<HomePage> {
     FlutterNativeSplash.remove();
     super.initState();
     dbHelper = Get.find();
+  }
+
+  void _hasData() {
+    Get.snackbar(
+      'Success',
+      'Data saved successfully',
+      duration: const Duration(seconds: 2),
+    );
+    setState(() {});
   }
 
   void importData() async {
@@ -111,43 +119,51 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(
-        title: "Home",
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Add a button to purge the DB
-            OutlinedButton(
-              onPressed: () async {
-                await dbHelper.purgeData();
-                Get.snackbar("Purge", "DB Purged!");
-              },
-              child: const Text('Purge DB'),
+      body: NestedScrollView(
+        floatHeaderSlivers: true,
+        headerSliverBuilder: (BuildContext context, bool isScrolled) {
+          return [
+            CustomAppBar(
+              title: 'Laundry',
+              hasData: _hasData,
             ),
-            // Add a button to toggle debug page
-            OutlinedButton(
-              onPressed: () {
-                Get.toNamed("/debug");
-              },
-              child: const Text('Debug Page'),
-            ),
-            // Add a button to import data
-            OutlinedButton(
-              onPressed: () {
-                importData();
-              },
-              child: const Text('Import Data'),
-            ),
-            // Add a button to export data
-            OutlinedButton(
-              onPressed: () {
-                exportData();
-              },
-              child: const Text('Export Data'),
-            ),
-          ],
+          ];
+        },
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Add a button to purge the DB
+              OutlinedButton(
+                onPressed: () async {
+                  await dbHelper.purgeData();
+                  Get.snackbar("Purge", "DB Purged!");
+                },
+                child: const Text('Purge DB'),
+              ),
+              // Add a button to toggle debug page
+              OutlinedButton(
+                onPressed: () {
+                  Get.toNamed("/debug");
+                },
+                child: const Text('Debug Page'),
+              ),
+              // Add a button to import data
+              OutlinedButton(
+                onPressed: () {
+                  importData();
+                },
+                child: const Text('Import Data'),
+              ),
+              // Add a button to export data
+              OutlinedButton(
+                onPressed: () {
+                  exportData();
+                },
+                child: const Text('Export Data'),
+              ),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: const NavBar(itemIndex: 0),

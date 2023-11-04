@@ -1,8 +1,10 @@
 import 'package:clothes_tracker/models/db_entry.dart';
 import 'package:clothes_tracker/models/state.dart';
+import 'package:clothes_tracker/navigation/navgation_bar.dart';
 import 'package:clothes_tracker/ui/app_bar.dart';
 import 'package:clothes_tracker/ui/display_card.dart';
 import 'package:clothes_tracker/utils/db.dart';
+import 'package:clothes_tracker/views/create_entry.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -154,9 +156,8 @@ class _DebugPageState extends State<DebugPage> {
         floatHeaderSlivers: true,
         headerSliverBuilder: (BuildContext context, bool isScrolled) {
           return [
-            CustomAppBar(
+            const CustomAppBar(
               title: 'Debug Page',
-              hasData: _hasData,
             ),
           ];
         },
@@ -194,6 +195,15 @@ class _DebugPageState extends State<DebugPage> {
           },
         ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: FloatingActionButton(
+        shape: const CircleBorder(),
+        child: const Icon(Icons.add),
+        onPressed: () async {
+          Get.to(() => DataCaptureScreen(hasData: _hasData));
+        },
+      ),
+      bottomNavigationBar: const NavBar(itemIndex: 4, showDebug: true),
     );
   }
 }

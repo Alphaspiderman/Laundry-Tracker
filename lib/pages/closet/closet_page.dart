@@ -4,6 +4,7 @@ import 'package:clothes_tracker/navigation/navgation_bar.dart';
 import 'package:clothes_tracker/ui/app_bar.dart';
 import 'package:clothes_tracker/ui/display_card.dart';
 import 'package:clothes_tracker/utils/db.dart';
+import 'package:clothes_tracker/views/create_entry.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -133,9 +134,8 @@ class _ClosetPageState extends State<ClosetPage> {
         floatHeaderSlivers: true,
         headerSliverBuilder: (BuildContext context, bool isScrolled) {
           return [
-            CustomAppBar(
+            const CustomAppBar(
               title: 'Closet',
-              hasData: _hasData,
             ),
           ];
         },
@@ -172,6 +172,14 @@ class _ClosetPageState extends State<ClosetPage> {
             }
           },
         ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: FloatingActionButton(
+        shape: const CircleBorder(),
+        child: const Icon(Icons.add),
+        onPressed: () async {
+          Get.to(() => DataCaptureScreen(hasData: _hasData));
+        },
       ),
       bottomNavigationBar: const NavBar(itemIndex: 1),
     );

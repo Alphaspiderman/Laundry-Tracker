@@ -132,36 +132,77 @@ class _HomePageState extends State<HomePage> {
         },
         body: Center(
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              // Add a button to purge the DB
-              OutlinedButton(
-                onPressed: () async {
-                  await dbHelper.purgeData();
-                  Get.snackbar("Purge", "DB Purged!");
+              // Show statistics of the app
+              FutureBuilder(
+                future: dbHelper.getStats(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Column(
+                      children: [
+                        Text(
+                          "Total Items: ${snapshot.data!["Total"]}",
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                        Text(
+                          "In Closet: ${snapshot.data!["Closet"]}",
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                        Text(
+                          "In Basket: ${snapshot.data!["Basket"]}",
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                        Text(
+                          "In Wash: ${snapshot.data!["Wash"]}",
+                          style: const TextStyle(fontSize: 20),
+                        ),
+                      ],
+                    );
+                  } else {
+                    return const CircularProgressIndicator();
+                  }
                 },
-                child: const Text('Purge DB'),
               ),
-              // Add a button to toggle debug page
-              OutlinedButton(
-                onPressed: () {
-                  Get.toNamed("/debug");
-                },
-                child: const Text('Debug Page'),
-              ),
-              // Add a button to import data
-              OutlinedButton(
-                onPressed: () {
-                  importData();
-                },
-                child: const Text('Import Data'),
-              ),
-              // Add a button to export data
-              OutlinedButton(
-                onPressed: () {
-                  exportData();
-                },
-                child: const Text('Export Data'),
+              Column(
+                children: [
+                  // Add a button to refresh
+                  OutlinedButton(
+                    onPressed: () {
+                      setState(() {});
+                    },
+                    child: const Text('Refresh'),
+                  ),
+                  // Add a button to purge the DB
+                  OutlinedButton(
+                    onPressed: () async {
+                      await dbHelper.purgeData();
+                      Get.snackbar("Purge", "DB Purged!");
+                    },
+                    child: const Text('Purge DB'),
+                  ),
+                  // Add a button to toggle debug page
+                  OutlinedButton(
+                    onPressed: () {
+                      Get.toNamed("/debug");
+                    },
+                    child: const Text('Debug Page'),
+                  ),
+                  // Add a button to import data
+                  OutlinedButton(
+                    onPressed: () {
+                      importData();
+                    },
+                    child: const Text('Import Data'),
+                  ),
+                  // Add a button to export data
+                  OutlinedButton(
+                    onPressed: () {
+                      exportData();
+                    },
+                    child: const Text('Export Data'),
+                  ),
+                ],
               ),
             ],
           ),

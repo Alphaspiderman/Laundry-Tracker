@@ -21,9 +21,15 @@ class DisplayCard extends StatelessWidget {
     this.onThirdButtonPressed,
   }) : super(key: key);
 
+  // Mapping of the state to the text to be displayed
+  static const Map<States, String> stateText = {
+    States.closet: 'Closet',
+    States.basket: 'Basket',
+    States.wash: 'Laundry',
+  };
+
   @override
   Widget build(BuildContext context) {
-    // Check if onThirdButtonPressed is null
     bool check = onThirdButtonPressed == null;
     List<Widget> buttons = check ? generateButtons() : generateButtonsDebug();
     return Card(
@@ -34,7 +40,7 @@ class DisplayCard extends StatelessWidget {
             titleTextStyle: const TextStyle(
               fontSize: 26,
             ),
-            subtitle: Text("Currently in ${data.state.name.capitalizeFirst}"),
+            subtitle: Text("Currently in ${stateText[data.state]}"),
             subtitleTextStyle: const TextStyle(
               fontSize: 16,
             ),
@@ -51,15 +57,16 @@ class DisplayCard extends StatelessWidget {
               );
             },
             child: Padding(
-              padding: const EdgeInsets.all(4.0),
+              padding: const EdgeInsets.all(8.0),
               child: Image.file(
                 File(data.imagePath),
-                height: 400,
+                // Let the image take up all the space it can
+                fit: BoxFit.contain,
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(4.0, 0.0, 4.0, 8.0),
+            padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: buttons,

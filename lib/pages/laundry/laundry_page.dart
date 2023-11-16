@@ -1,7 +1,6 @@
 import 'package:clothes_tracker/models/state.dart';
 import 'package:clothes_tracker/navigation/navgation_bar.dart';
 import 'package:clothes_tracker/ui/display_card.dart';
-import 'package:clothes_tracker/views/create_entry.dart';
 import 'package:clothes_tracker/ui/app_bar.dart';
 import 'package:clothes_tracker/utils/db.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +18,7 @@ class LaundryPage extends StatefulWidget {
 class _LaundryPageState extends State<LaundryPage> {
   final DatabaseHelper dbHelper = Get.find();
 
-  void _hasData() {
+  void _reloadData() {
     Get.snackbar(
       'Success',
       'Data saved successfully',
@@ -130,51 +129,52 @@ class _LaundryPageState extends State<LaundryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(
-        title: "Laundry",
+      body: NestedScrollView(
+        floatHeaderSlivers: true,
+        headerSliverBuilder: (BuildContext context, bool isScrolled) {
+          return [
+            CustomAppBar(
+              title: 'Laundry',
+              hasData: _reloadData,
+            ),
+          ];
+        },
+        body: FutureBuilder(
+          future: dbHelper.fetchDataByState(States.wash),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                heightFactor: 10,
+                widthFactor: 10,
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else {
+              // Display details about data
+              // return Text('Data: ${snapshot.data}');
+              List<DbEntry> dataList = snapshot.data as List<DbEntry>;
+              // Display the items in list as cards
+              return ListView.builder(
+                itemCount: dataList.length,
+                itemBuilder: (context, index) {
+                  // return a display card
+                  return DisplayCard(
+                    data: dataList[index],
+                    onFirstButtonPressed: moveToBasket,
+                    onSecondButtonPressed: moveToCloset,
+                    onDelete: (int id) async {
+                      await _deleteEntry(id);
+                    },
+                  );
+                },
+              );
+            }
+          },
+        ),
       ),
       // Add a FAB to create DB entry
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          // Create a DB entry taking data from user input
-          Get.to(() => DataCaptureScreen(hasData: _hasData));
-        },
-        child: const Icon(Icons.add),
-      ),
       bottomNavigationBar: const NavBar(itemIndex: 3),
-      body: FutureBuilder(
-        future: dbHelper.fetchDataByState(States.wash),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              heightFactor: 10,
-              widthFactor: 10,
-              child: CircularProgressIndicator(),
-            );
-          } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          } else {
-            // Display details about data
-            // return Text('Data: ${snapshot.data}');
-            List<DbEntry> dataList = snapshot.data as List<DbEntry>;
-            // Display the items in list as cards
-            return ListView.builder(
-              itemCount: dataList.length,
-              itemBuilder: (context, index) {
-                // return a display card
-                return DisplayCard(
-                  data: dataList[index],
-                  onFirstButtonPressed: moveToCloset,
-                  onSecondButtonPressed: moveToCloset,
-                  onDelete: (int id) async {
-                    await _deleteEntry(id);
-                  },
-                );
-              },
-            );
-          }
-        },
-      ),
     );
   }
 }

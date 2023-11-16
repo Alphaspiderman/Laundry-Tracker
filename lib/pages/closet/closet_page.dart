@@ -1,7 +1,6 @@
 import 'package:clothes_tracker/models/state.dart';
 import 'package:clothes_tracker/navigation/navgation_bar.dart';
 import 'package:clothes_tracker/ui/display_card.dart';
-import 'package:clothes_tracker/views/create_entry.dart';
 import 'package:clothes_tracker/ui/app_bar.dart';
 import 'package:clothes_tracker/utils/db.dart';
 import 'package:flutter/material.dart';
@@ -130,50 +129,51 @@ class _ClosetPageState extends State<ClosetPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const CustomAppBar(
-        title: "Closet",
+      body: NestedScrollView(
+        floatHeaderSlivers: true,
+        headerSliverBuilder: (BuildContext context, bool isScrolled) {
+          return [
+            CustomAppBar(
+              title: 'Closet',
+              hasData: _hasData,
+            ),
+          ];
+        },
+        body: FutureBuilder(
+          future: dbHelper.fetchDataByState(States.closet),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                heightFactor: 10,
+                widthFactor: 10,
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else {
+              // Display details about data
+              // return Text('Data: ${snapshot.data}');
+              List<DbEntry> dataList = snapshot.data as List<DbEntry>;
+              // Display the items in list as cards
+              return ListView.builder(
+                itemCount: dataList.length,
+                itemBuilder: (context, index) {
+                  // return a display card
+                  return DisplayCard(
+                    data: dataList[index],
+                    onFirstButtonPressed: moveToBasket,
+                    onSecondButtonPressed: moveToLaundry,
+                    onDelete: (int id) async {
+                      await _deleteEntry(id);
+                    },
+                  );
+                },
+              );
+            }
+          },
+        ),
       ),
       bottomNavigationBar: const NavBar(itemIndex: 1),
-      // Add a FAB to create DB entry
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          Get.to(() => DataCaptureScreen(hasData: _hasData));
-        },
-        child: const Icon(Icons.add),
-      ),
-      body: FutureBuilder(
-        future: dbHelper.fetchDataByState(States.closet),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              heightFactor: 10,
-              widthFactor: 10,
-              child: CircularProgressIndicator(),
-            );
-          } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          } else {
-            // Display details about data
-            // return Text('Data: ${snapshot.data}');
-            List<DbEntry> dataList = snapshot.data as List<DbEntry>;
-            // Display the items in list as cards
-            return ListView.builder(
-              itemCount: dataList.length,
-              itemBuilder: (context, index) {
-                // return a display card
-                return DisplayCard(
-                  data: dataList[index],
-                  onFirstButtonPressed: moveToBasket,
-                  onSecondButtonPressed: moveToLaundry,
-                  onDelete: (int id) async {
-                    await _deleteEntry(id);
-                  },
-                );
-              },
-            );
-          }
-        },
-      ),
     );
   }
 }

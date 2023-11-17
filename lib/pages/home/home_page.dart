@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:clothes_tracker/navigation/navgation_bar.dart';
 import 'package:clothes_tracker/ui/app_bar.dart';
 import 'package:clothes_tracker/utils/db.dart';
@@ -54,58 +53,24 @@ class _HomePageState extends State<HomePage> {
     } else {
       // Create a popup with a message and yes-no buttons
       Get.dialog(
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Material(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 25.0,
-                    vertical: 30,
-                  ),
-                  child: Column(
-                    children: [
-                      const Text(
-                        "Warning",
-                        style: TextStyle(fontSize: 26),
-                      ),
-                      const SizedBox(height: 20),
-                      const Text(
-                        "Local data will be removed before import is attempted!! \nIn case of failed import, existing data will not be restored",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Get.back();
-                              },
-                              child: const Text(
-                                'NO',
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                await dbHelper.importData(File(path));
-                              },
-                              child: const Text(
-                                'YES',
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+        AlertDialog(
+          title: const Text("Confirm Action"),
+          content: const Text(
+            "Local data will be removed before import is attempted!! \nIn case of failed import, existing data will not be restored",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Get.back();
+              },
+              child: const Text("NO"),
+            ),
+            TextButton(
+              onPressed: () async {
+                Get.back();
+                await dbHelper.importData(File(path));
+              },
+              child: const Text("YES"),
             ),
           ],
         ),

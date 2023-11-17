@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:clothes_tracker/models/db_entry.dart';
 import 'package:clothes_tracker/models/state.dart';
 import 'package:clothes_tracker/utils/db.dart';
@@ -10,6 +11,7 @@ import 'package:path/path.dart';
 class DataCaptureScreen extends StatefulWidget {
   // Get a callback when data is saved
   final Function() hasData;
+
   const DataCaptureScreen({super.key, required this.hasData});
 
   @override

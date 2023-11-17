@@ -1,6 +1,6 @@
 // Your controller class
-import 'package:get/get.dart';
 import 'package:clothes_tracker/utils/db.dart';
+import 'package:get/get.dart';
 
 class DBController extends GetxController {
   late DatabaseHelper _db;

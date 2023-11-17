@@ -1,13 +1,14 @@
 import 'dart:io';
+
 import 'package:clothes_tracker/pages/basket/basket_page.dart';
 import 'package:clothes_tracker/pages/closet/closet_page.dart';
 import 'package:clothes_tracker/pages/debug/debug.dart';
 import 'package:clothes_tracker/pages/home/home_page.dart';
 import 'package:clothes_tracker/pages/laundry/laundry_page.dart';
-import 'package:clothes_tracker/utils/controller.dart';
-import 'package:flutter/material.dart';
 import 'package:clothes_tracker/themes/dark.dart';
 import 'package:clothes_tracker/themes/light.dart';
+import 'package:clothes_tracker/utils/controller.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:path/path.dart';

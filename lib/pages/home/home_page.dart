@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:clothes_tracker/navigation/navgation_bar.dart';
 import 'package:clothes_tracker/ui/app_bar.dart';
 import 'package:clothes_tracker/utils/db.dart';
+import 'package:clothes_tracker/views/create_entry.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -72,7 +73,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       const SizedBox(height: 20),
                       const Text(
-                        "Local data will be removed before import is attempted!! \nIncase of failed import, exisiting data will not be restored",
+                        "Local data will be removed before import is attempted!! \nIn case of failed import, existing data will not be restored",
                         style: TextStyle(fontSize: 16),
                       ),
                       const SizedBox(height: 20),
@@ -124,9 +125,8 @@ class _HomePageState extends State<HomePage> {
         floatHeaderSlivers: true,
         headerSliverBuilder: (BuildContext context, bool isScrolled) {
           return [
-            CustomAppBar(
-              title: 'Laundry',
-              hasData: _hasData,
+            const CustomAppBar(
+              title: 'Home',
             ),
           ];
         },
@@ -166,6 +166,14 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: FloatingActionButton(
+        shape: const CircleBorder(),
+        child: const Icon(Icons.add),
+        onPressed: () async {
+          Get.to(() => DataCaptureScreen(hasData: _hasData));
+        },
       ),
       bottomNavigationBar: const NavBar(itemIndex: 0),
     );

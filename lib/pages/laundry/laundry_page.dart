@@ -4,6 +4,7 @@ import 'package:clothes_tracker/navigation/navgation_bar.dart';
 import 'package:clothes_tracker/ui/app_bar.dart';
 import 'package:clothes_tracker/ui/display_card.dart';
 import 'package:clothes_tracker/utils/db.dart';
+import 'package:clothes_tracker/views/create_entry.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -18,7 +19,7 @@ class LaundryPage extends StatefulWidget {
 class _LaundryPageState extends State<LaundryPage> {
   final DatabaseHelper dbHelper = Get.find();
 
-  void _reloadData() {
+  void _hasData() {
     Get.snackbar(
       'Success',
       'Data saved successfully',
@@ -133,9 +134,8 @@ class _LaundryPageState extends State<LaundryPage> {
         floatHeaderSlivers: true,
         headerSliverBuilder: (BuildContext context, bool isScrolled) {
           return [
-            CustomAppBar(
+            const CustomAppBar(
               title: 'Laundry',
-              hasData: _reloadData,
             ),
           ];
         },
@@ -173,8 +173,15 @@ class _LaundryPageState extends State<LaundryPage> {
           },
         ),
       ),
-      // Add a FAB to create DB entry
-      bottomNavigationBar: const NavBar(itemIndex: 3),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: FloatingActionButton(
+        shape: const CircleBorder(),
+        child: const Icon(Icons.add),
+        onPressed: () async {
+          Get.to(() => DataCaptureScreen(hasData: _hasData));
+        },
+      ),
+      bottomNavigationBar: const NavBar(itemIndex: 4),
     );
   }
 }

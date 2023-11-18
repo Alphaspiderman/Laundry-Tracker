@@ -1,19 +1,10 @@
-import 'package:clothes_tracker/views/create_entry.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 class CustomAppBar extends StatelessWidget {
-  const CustomAppBar({required this.title, Key? key, required this.hasData})
-      : super(key: key);
+  const CustomAppBar({required this.title, Key? key}) : super(key: key);
   final String title;
-
-  // Function passed in via constructor to be called when data is saved
-  final Function hasData;
-
-  void _hasData() {
-    hasData();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,18 +18,13 @@ class CustomAppBar extends StatelessWidget {
       ),
       actions: [
         IconButton(
-          onPressed: () async {
-            // Create a DB entry taking data from user input
-            Get.to(() => DataCaptureScreen(hasData: _hasData));
+          onPressed: () {
+            Get.changeThemeMode(
+                Get.isDarkMode ? ThemeMode.light : ThemeMode.dark);
           },
-          icon: const Icon(Icons.add),
+          icon:
+              Icon(Get.isDarkMode ? Icons.dark_mode : Icons.dark_mode_outlined),
         )
-        // onPressed: () {
-        //   Get.changeThemeMode(
-        //       Get.isDarkMode ? ThemeMode.light : ThemeMode.dark);
-        // },
-        // icon: Icon(
-        //     Get.isDarkMode ? Icons.dark_mode : Icons.dark_mode_outlined))
       ],
       floating: true,
       snap: true,

@@ -182,8 +182,8 @@ class _DebugPageState extends State<DebugPage> {
                 itemBuilder: (context, index) {
                   return DisplayCard(
                     data: dataList[index],
-                    onFirstButtonPressed: moveToBasket,
-                    onSecondButtonPressed: moveToCloset,
+                    onFirstButtonPressed: moveToCloset,
+                    onSecondButtonPressed: moveToBasket,
                     onDelete: (int id) async {
                       await _deleteEntry(id);
                     },

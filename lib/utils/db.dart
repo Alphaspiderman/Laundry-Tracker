@@ -266,6 +266,7 @@ class DatabaseHelper {
     await Directory(imagePath).create();
   }
 
+  // Generate a list of DbEntry from a list of maps
   List<DbEntry> generateList(List<Map<String, dynamic>> maps,
       {bool prepend = true}) {
     return List.generate(maps.length, (index) {
@@ -274,5 +275,41 @@ class DatabaseHelper {
       map.addEntries([MapEntry('prepend', prepend ? appDir!.path : '')]);
       return DbEntry.fromMap(map);
     });
+  }
+
+  // Get Stats
+  Future<Map<String, int>> getStats() async {
+    Database db = await database;
+    // Query for all entries
+    final List<Map<String, dynamic>> maps = await db.query('clothes');
+
+    // Generate a list of DbEntry
+    List<DbEntry> dataList = generateList(maps, prepend: false);
+
+    // Declare the map
+    Map<String, int> stats = {
+      "Total": 0,
+      "Closet": 0,
+      "Basket": 0,
+      "Wash": 0,
+    };
+
+    // Count the number of items in each state
+    for (var data in dataList) {
+      stats["Total"] = stats["Total"]! + 1;
+      switch (data.state) {
+        case States.closet:
+          stats["Closet"] = stats["Closet"]! + 1;
+          break;
+        case States.basket:
+          stats["Basket"] = stats["Basket"]! + 1;
+          break;
+        case States.wash:
+          stats["Wash"] = stats["Wash"]! + 1;
+          break;
+      }
+    }
+
+    return stats;
   }
 }

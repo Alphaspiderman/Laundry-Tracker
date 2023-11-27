@@ -30,9 +30,36 @@ class _HomePageState extends State<HomePage> {
     Get.snackbar(
       'Success',
       'Data saved successfully',
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 1),
     );
     setState(() {});
+  }
+
+  void confirmDbPurge() {
+    Get.dialog(
+      AlertDialog(
+        title: const Text("Confirm Action"),
+        content: const Text(
+          "This will delete all data from the database!!",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Get.back();
+            },
+            child: const Text("NO"),
+          ),
+          TextButton(
+            onPressed: () async {
+              Get.back();
+              await dbHelper.purgeData();
+              Get.snackbar("Purge", "DB Purged!");
+            },
+            child: const Text("YES"),
+          ),
+        ],
+      ),
+    );
   }
 
   void importData() async {
@@ -141,8 +168,7 @@ class _HomePageState extends State<HomePage> {
                   // Add a button to purge the DB
                   OutlinedButton(
                     onPressed: () async {
-                      await dbHelper.purgeData();
-                      Get.snackbar("Purge", "DB Purged!");
+                      confirmDbPurge();
                     },
                     child: const Text('Purge DB'),
                   ),

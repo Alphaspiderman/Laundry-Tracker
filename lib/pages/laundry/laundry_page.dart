@@ -28,7 +28,7 @@ class _LaundryPageState extends State<LaundryPage> {
     Get.snackbar(
       'Success',
       'Data saved successfully',
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 1),
     );
     setState(() {});
   }

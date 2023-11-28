@@ -12,7 +12,7 @@ class DebugController extends GetxController {
     Get.snackbar(
       'Success',
       'Data saved successfully',
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 1),
     );
     update();
   }
@@ -27,7 +27,7 @@ class DebugController extends GetxController {
     Get.snackbar(
       'Success',
       'Item moved to Closet',
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 1),
     );
     // Update the view
     update();
@@ -43,7 +43,7 @@ class DebugController extends GetxController {
     Get.snackbar(
       'Success',
       'Item moved to Basket',
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 1),
     );
     // Update the view
     update();
@@ -59,7 +59,7 @@ class DebugController extends GetxController {
     Get.snackbar(
       'Success',
       'Item moved to Laundry',
-      duration: const Duration(seconds: 3),
+      duration: const Duration(seconds: 1),
     );
     // Rebuild the view
     update();

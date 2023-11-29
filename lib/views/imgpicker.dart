@@ -1,14 +1,18 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:logger/logger.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
 class ImagePickerWidget extends StatelessWidget {
   final Function(String, String) onDataReceived;
 
-  const ImagePickerWidget({super.key, required this.onDataReceived});
+  ImagePickerWidget({super.key, required this.onDataReceived});
+
+  final Logger log = Get.find();
 
   String getSafe() {
     var now = DateTime.now();
@@ -89,7 +93,7 @@ class ImagePickerWidget extends StatelessWidget {
         return null;
       }
     } catch (e) {
-      print("Error picking image: $e");
+      log.e("Error picking image: $e");
       return null;
     }
   }

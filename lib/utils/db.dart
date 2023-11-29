@@ -6,6 +6,7 @@ import 'package:clothes_tracker/models/state.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_archive/flutter_archive.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -14,6 +15,7 @@ class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
   static Database? _database;
   static Directory? appDir;
+  static Logger log = Get.find();
 
   Future<Database> get database async {
     appDir = await getApplicationDocumentsDirectory();
@@ -48,6 +50,7 @@ class DatabaseHelper {
       },
       version: 1,
     );
+    log.i("Database initialized");
   }
 
   Future<void> insertData(DbEntry data, File imageFile) async {
@@ -63,18 +66,20 @@ class DatabaseHelper {
     Database db = await database;
 
     // Insert data into the database
-    await db.insert('clothes', {
-      'name': data.name,
-      'state': data.state.index,
-      'image_path': imagePathClean,
-    });
+    await db.insert(
+      'clothes',
+      {
+        'name': data.name,
+        'state': data.state.index,
+        'image_path': imagePathClean,
+      },
+    );
   }
 
   Future<List<DbEntry>> fetchData() async {
     Database db = await database;
     // Query for all entries
     final List<Map<String, dynamic>> maps = await db.query('clothes');
-
     return generateList(maps);
   }
 
@@ -111,7 +116,8 @@ class DatabaseHelper {
       where: 'id = ?',
       whereArgs: [id],
     );
-    //
+    log.d("Data to delete: $data");
+    // Get the image path
     var map = Map<String, dynamic>.from(data[0]);
     map.addEntries([MapEntry('prepend', appDir!.path)]);
     // Convert to DbEntry
@@ -179,13 +185,17 @@ class DatabaseHelper {
 
   // Export data as a ZIP
   Future<void> exportData() async {
+    // Log
+    log.d("Exporting data");
     // Declare folder for export
     final exportDir = Directory(join(appDir!.path, "export"));
     final exportImagesDir = Directory(join(exportDir.path, "images"));
 
     // Delete directory if it exists
     if (exportDir.existsSync()) {
-      await exportDir.delete(recursive: true);
+      await exportDir
+          .delete(recursive: true)
+          .then((value) => log.d("Deleted old export folder"));
     }
     // Create directory
     await exportImagesDir.create(recursive: true);
@@ -215,14 +225,14 @@ class DatabaseHelper {
       // Access file to copy
       File f = File(imagesDir.path + data.imagePath);
 
-      print(f.path);
-      print(exportImagePath);
+      log.d(f.path);
+      log.d(exportImagePath);
 
       // Copy the file
       if (await f.exists()) {
         await f.copy(exportImagePath);
       } else {
-        print(f.path);
+        log.d(f.path);
       }
     }
 

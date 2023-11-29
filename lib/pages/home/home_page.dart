@@ -7,6 +7,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -18,6 +19,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late final DatabaseHelper dbHelper;
+  final Logger log = Get.find();
 
   @override
   void initState() {
@@ -32,6 +34,7 @@ class _HomePageState extends State<HomePage> {
       'Data saved successfully',
       duration: const Duration(seconds: 1),
     );
+    log.d("Data saved successfully");
     setState(() {});
   }
 
@@ -46,6 +49,7 @@ class _HomePageState extends State<HomePage> {
           TextButton(
             onPressed: () {
               Get.back();
+              log.d("DB Purge cancelled");
             },
             child: const Text("NO"),
           ),
@@ -54,6 +58,7 @@ class _HomePageState extends State<HomePage> {
               Get.back();
               await dbHelper.purgeData();
               Get.snackbar("Purge", "DB Purged!");
+              log.d("DB Purged");
             },
             child: const Text("YES"),
           ),
@@ -69,6 +74,7 @@ class _HomePageState extends State<HomePage> {
     if (result == null) {
       // User canceled the picker
       Get.snackbar("Import Failed", "No file selected!");
+      log.i("Import failed: No file selected");
       return;
     }
     // Get the file path
@@ -76,6 +82,7 @@ class _HomePageState extends State<HomePage> {
     // Confirm its a ZIP file
     if (!path.endsWith(".zip")) {
       Get.snackbar("Import Failed", "Invalid file type!");
+      log.i("Import failed: Invalid file type");
       return;
     } else {
       // Create a popup with a message and yes-no buttons
@@ -89,12 +96,14 @@ class _HomePageState extends State<HomePage> {
             TextButton(
               onPressed: () {
                 Get.back();
+                log.d("Import cancelled");
               },
               child: const Text("NO"),
             ),
             TextButton(
               onPressed: () async {
                 Get.back();
+                log.d("Importing data from $path");
                 await dbHelper.importData(File(path));
               },
               child: const Text("YES"),

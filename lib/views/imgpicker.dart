@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logger/logger.dart';
@@ -74,8 +75,13 @@ class ImagePickerWidget extends StatelessWidget {
       // Create the final paths for the temp and final locations
       String tempImagePath = join(appDir.path, 'temp', imageName);
 
-      // Move file to temp location
-      await imageFile.saveTo(tempImagePath);
+      // Compress the image
+      await FlutterImageCompress.compressAndGetFile(
+        imageFile.path,
+        tempImagePath,
+      );
+
+      // Return the data to the parent widget
       onDataReceived(appDir.path, imageName);
     }
   }

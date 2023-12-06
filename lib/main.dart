@@ -7,7 +7,7 @@ import 'package:clothes_tracker/pages/home/home_page.dart';
 import 'package:clothes_tracker/pages/laundry/laundry_page.dart';
 import 'package:clothes_tracker/themes/dark.dart';
 import 'package:clothes_tracker/themes/light.dart';
-import 'package:clothes_tracker/utils/controller.dart';
+import 'package:clothes_tracker/utils/db.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
@@ -59,9 +59,10 @@ void main() async {
         .then((value) => logger.d('Deleted old export folder'));
   }
 
-  DBController db = DBController();
-  db.initClass();
-  Get.put(db.db);
+  DatabaseHelper db = DatabaseHelper();
+  await db.initClass();
+
+  Get.put(db);
 
   runApp(const MyApp());
 }

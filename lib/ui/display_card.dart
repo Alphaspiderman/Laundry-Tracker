@@ -103,7 +103,7 @@ class DisplayCard extends StatelessWidget {
     // Add the third Button
     buttons.add(
       OutlinedButton(
-        onPressed: () => onSecondButtonPressed(data.id),
+        onPressed: () => onThirdButtonPressed!(data.id),
         child: const Text('Laundry'),
       ),
     );

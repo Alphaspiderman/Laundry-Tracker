@@ -13,24 +13,50 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:logger/logger.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  // Create images folders
+  // Initalise Logger
+  var logger = Logger(
+    printer: PrettyPrinter(
+      methodCount: 2,
+      errorMethodCount: 8,
+      lineLength: 120,
+      colors: stdout.supportsAnsiEscapes,
+      printEmojis: false,
+      printTime: true,
+    ),
+  );
+  // Put Logger in GetX
+  Get.put(logger);
+
+  // Manage Folders
   final appDir = await getApplicationDocumentsDirectory();
-  Directory(join(appDir.path, 'images')).create(recursive: true);
+
+  // Check if images folder exists
+  final imagesDir = Directory(join(appDir.path, 'images'));
+  if (!imagesDir.existsSync()) {
+    await imagesDir
+        .create(recursive: true)
+        .then((value) => logger.d('Created images folder'));
+  }
 
   // Delete the old import/export folders
   final oldImportDir = Directory(join(appDir.path, 'import'));
   final oldExportDir = Directory(join(appDir.path, 'export'));
 
   if (oldImportDir.existsSync()) {
-    await oldImportDir.delete(recursive: true);
+    await oldImportDir
+        .delete(recursive: true)
+        .then((value) => logger.d('Deleted old import folder'));
   }
   if (oldExportDir.existsSync()) {
-    await oldExportDir.delete(recursive: true);
+    await oldExportDir
+        .delete(recursive: true)
+        .then((value) => logger.d('Deleted old export folder'));
   }
 
   DBController db = DBController();

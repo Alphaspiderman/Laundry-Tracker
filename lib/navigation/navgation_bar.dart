@@ -21,8 +21,7 @@ class _NavBarState extends State<NavBar> {
         IconButton(
           icon: const Icon(Icons.developer_mode),
           tooltip: "Debug",
-          onPressed: () =>
-              Get.offNamedUntil('/debug', ModalRoute.withName('/home')),
+          onPressed: () => Get.offAllNamed('/debug'),
         ),
       );
     }
@@ -62,26 +61,23 @@ class _NavBarState extends State<NavBar> {
     IconButton(
       icon: const Icon(Icons.home),
       tooltip: "Home",
-      onPressed: () => Get.back(),
+      onPressed: () => Get.offAllNamed('/home'),
     ),
     IconButton(
       icon: const Icon(Icons.door_sliding_rounded),
       tooltip: "Closet",
-      onPressed: () =>
-          Get.offNamedUntil('/closet', ModalRoute.withName('/home')),
+      onPressed: () => Get.offAllNamed('/closet'),
     ),
     const SizedBox(width: 40),
     IconButton(
       icon: const Icon(Icons.shopping_basket),
       tooltip: "Basket",
-      onPressed: () =>
-          Get.offNamedUntil('/basket', ModalRoute.withName('/home')),
+      onPressed: () => Get.offAllNamed('/basket'),
     ),
     IconButton(
       icon: const Icon(Icons.local_laundry_service),
       tooltip: "At Wash",
-      onPressed: () =>
-          Get.offNamedUntil('/laundry', ModalRoute.withName('/home')),
+      onPressed: () => Get.offAllNamed('/laundry'),
     ),
   ];
 }

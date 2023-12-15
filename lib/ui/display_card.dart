@@ -32,47 +32,53 @@ class DisplayCard extends StatelessWidget {
   Widget build(BuildContext context) {
     bool check = onThirdButtonPressed == null;
     List<Widget> buttons = check ? generateButtons() : generateButtonsDebug();
-    return Card(
-      child: Column(
-        children: [
-          ListTile(
-            title: Text(data.name),
-            titleTextStyle: const TextStyle(
-              fontSize: 26,
-            ),
-            subtitle: Text("Currently in ${stateText[data.state]}"),
-            subtitleTextStyle: const TextStyle(
-              fontSize: 16,
-            ),
-          ),
-          GestureDetector(
-            onTap: () {
-              Get.dialog(
-                Dialog(
-                  child: Image.file(
-                    File(data.imagePath),
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              );
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Image.file(
-                File(data.imagePath),
-                // Let the image take up all the space it can
-                fit: BoxFit.contain,
+    // Make a card with the data and buttons but limit the height to 300 pixels and fully expand the width of the screen
+    return SizedBox(
+      height: 350,
+      child: Card(
+        child: Column(
+          children: [
+            ListTile(
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              title: Text(data.name),
+              titleTextStyle: const TextStyle(
+                fontSize: 26,
+              ),
+              subtitle: Text("Currently in ${stateText[data.state]}"),
+              subtitleTextStyle: const TextStyle(
+                fontSize: 16,
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: buttons,
+            GestureDetector(
+              onTap: () {
+                Get.dialog(
+                  Dialog(
+                    child: Image.file(
+                      File(data.imagePath),
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                );
+              },
+              child: SizedBox(
+                child: Image.file(
+                  File(data.imagePath),
+                  fit: BoxFit.fitWidth,
+                  cacheHeight: 200,
+                ),
+              ),
             ),
-          ),
-        ],
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 5.0, horizontal: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: buttons,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

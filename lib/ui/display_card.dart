@@ -13,13 +13,13 @@ class DisplayCard extends StatelessWidget {
   final Function(int) onDelete;
 
   const DisplayCard({
-    Key? key,
+    super.key,
     required this.data,
     required this.onFirstButtonPressed,
     required this.onSecondButtonPressed,
     required this.onDelete,
     this.onThirdButtonPressed,
-  }) : super(key: key);
+  });
 
   // Mapping of the state to the text to be displayed
   static const Map<States, String> stateText = {

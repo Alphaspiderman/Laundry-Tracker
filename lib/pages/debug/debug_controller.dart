@@ -82,6 +82,7 @@ class DebugController extends GetxController {
           List<DbEntry> dataList = snapshot.data as List<DbEntry>;
           // Display the items in list as cards
           return ListView.builder(
+            key: const PageStorageKey('debug_list'),
             itemCount: dataList.length,
             itemBuilder: (context, index) {
               // return a display card

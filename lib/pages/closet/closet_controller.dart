@@ -66,6 +66,7 @@ class ClosetController extends GetxController {
           List<DbEntry> dataList = snapshot.data as List<DbEntry>;
           // Display the items in list as cards
           return ListView.builder(
+            key: const PageStorageKey('closet'),
             itemCount: dataList.length,
             itemBuilder: (context, index) {
               // return a display card

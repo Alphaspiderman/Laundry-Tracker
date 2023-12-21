@@ -168,13 +168,6 @@ class _HomePageState extends State<HomePage> {
               ),
               Column(
                 children: [
-                  // Add a button to refresh
-                  OutlinedButton(
-                    onPressed: () {
-                      setState(() {});
-                    },
-                    child: const Text('Refresh'),
-                  ),
                   // Add a button to purge the DB
                   OutlinedButton(
                     onPressed: () async {
@@ -185,7 +178,7 @@ class _HomePageState extends State<HomePage> {
                   // Add a button to toggle debug page
                   OutlinedButton(
                     onPressed: () {
-                      Get.toNamed("/debug");
+                      Get.offAllNamed('/debug');
                     },
                     child: const Text('Debug Page'),
                   ),

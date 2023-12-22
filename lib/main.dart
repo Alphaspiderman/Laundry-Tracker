@@ -8,12 +8,15 @@ import 'package:clothes_tracker/pages/laundry/laundry_page.dart';
 import 'package:clothes_tracker/themes/dark.dart';
 import 'package:clothes_tracker/themes/light.dart';
 import 'package:clothes_tracker/utils/db.dart';
+import 'package:clothes_tracker/utils/list_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+
+import 'models/state.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -65,6 +68,15 @@ void main() async {
   Get.put(db);
 
   runApp(const MyApp());
+
+  ListController closetList = Get.put(ListController(), tag: "closet");
+  ListController basketList = Get.put(ListController(), tag: "basket");
+  ListController washList = Get.put(ListController(), tag: "wash");
+
+  // Fetch data for each list
+  closetList.refreshData(States.closet);
+  basketList.refreshData(States.basket);
+  washList.refreshData(States.wash);
 }
 
 class MyApp extends StatelessWidget {

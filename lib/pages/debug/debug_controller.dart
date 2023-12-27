@@ -2,11 +2,19 @@ import 'package:clothes_tracker/models/db_entry.dart';
 import 'package:clothes_tracker/models/state.dart';
 import 'package:clothes_tracker/ui/display_card.dart';
 import 'package:clothes_tracker/utils/db.dart';
+import 'package:clothes_tracker/utils/list_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class DebugController extends GetxController {
   final DatabaseHelper dbHelper = Get.find();
+
+  void refreshLists(int id) {
+    // Get and refresh all list controllers
+    Get.find<ListController>(tag: "basket").refreshData(States.basket);
+    Get.find<ListController>(tag: "closet").refreshData(States.closet);
+    Get.find<ListController>(tag: "laundry").refreshData(States.wash);
+  }
 
   void hasData() {
     Get.snackbar(
@@ -23,6 +31,8 @@ class DebugController extends GetxController {
       id,
       States.closet,
     );
+    // Remove from list
+    refreshLists(id);
     // Show a notification
     Get.snackbar(
       'Success',
@@ -39,6 +49,8 @@ class DebugController extends GetxController {
       id,
       States.basket,
     );
+    // Remove from list
+    refreshLists(id);
     // Show a notification
     Get.snackbar(
       'Success',
@@ -82,7 +94,6 @@ class DebugController extends GetxController {
           List<DbEntry> dataList = snapshot.data as List<DbEntry>;
           // Display the items in list as cards
           return ListView.builder(
-            key: const PageStorageKey('debug_list'),
             itemCount: dataList.length,
             itemBuilder: (context, index) {
               // return a display card

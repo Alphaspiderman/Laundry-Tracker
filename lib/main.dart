@@ -71,7 +71,7 @@ void main() async {
 
   ListController closetList = Get.put(ListController(), tag: "closet");
   ListController basketList = Get.put(ListController(), tag: "basket");
-  ListController washList = Get.put(ListController(), tag: "wash");
+  ListController washList = Get.put(ListController(), tag: "laundry");
 
   // Fetch data for each list
   closetList.refreshData(States.closet);

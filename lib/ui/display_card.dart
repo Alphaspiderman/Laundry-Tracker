@@ -25,7 +25,7 @@ class DisplayCard extends StatelessWidget {
   static const Map<States, String> stateText = {
     States.closet: 'Closet',
     States.basket: 'Basket',
-    States.wash: 'Laundry',
+    States.laundry: 'Laundry',
   };
 
   @override
@@ -130,7 +130,7 @@ class DisplayCard extends StatelessWidget {
         firstText = const Text('Move to Closet');
         secondText = const Text('Send to Laundry');
         break;
-      case States.wash:
+      case States.laundry:
         firstText = const Text('Move to Basket');
         secondText = const Text('Move to Closet');
         break;

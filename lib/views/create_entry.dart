@@ -72,7 +72,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                   child: Text('Basket'),
                 ),
                 DropdownMenuItem(
-                  value: States.wash,
+                  value: States.laundry,
                   child: Text('Laundry'),
                 ),
               ],

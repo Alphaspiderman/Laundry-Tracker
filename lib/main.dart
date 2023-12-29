@@ -76,7 +76,7 @@ void main() async {
   // Fetch data for each list
   closetList.refreshData(States.closet);
   basketList.refreshData(States.basket);
-  washList.refreshData(States.wash);
+  washList.refreshData(States.laundry);
 }
 
 class MyApp extends StatelessWidget {

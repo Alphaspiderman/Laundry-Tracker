@@ -13,7 +13,7 @@ class DebugController extends GetxController {
     // Get and refresh all list controllers
     Get.find<ListController>(tag: "basket").refreshData(States.basket);
     Get.find<ListController>(tag: "closet").refreshData(States.closet);
-    Get.find<ListController>(tag: "laundry").refreshData(States.wash);
+    Get.find<ListController>(tag: "laundry").refreshData(States.laundry);
   }
 
   void hasData() {
@@ -65,7 +65,7 @@ class DebugController extends GetxController {
     // Use the updateState on database
     await dbHelper.updateState(
       id,
-      States.wash,
+      States.laundry,
     );
     // Show a notification
     Get.snackbar(

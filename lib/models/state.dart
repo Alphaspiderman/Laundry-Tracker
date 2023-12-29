@@ -2,5 +2,5 @@
 enum States {
   closet,
   basket,
-  wash,
+  laundry,
 }

@@ -314,7 +314,7 @@ class DatabaseHelper {
         case States.basket:
           stats["Basket"] = stats["Basket"]! + 1;
           break;
-        case States.wash:
+        case States.laundry:
           stats["Wash"] = stats["Wash"]! + 1;
           break;
       }

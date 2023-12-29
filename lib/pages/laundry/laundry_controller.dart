@@ -13,7 +13,7 @@ class LaundryController extends GetxController {
   // Function to update the list in the controller
   Future<void> refreshData() async {
     // Get the data from the database
-    final List<DbEntry> data = await dbHelper.fetchDataByState(States.wash);
+    final List<DbEntry> data = await dbHelper.fetchDataByState(States.laundry);
     // Update the list in the controller
     listController.items.value = data;
   }
@@ -31,7 +31,7 @@ class LaundryController extends GetxController {
     // Get and refresh all list controllers
     Get.find<ListController>(tag: "basket").refreshData(States.basket);
     Get.find<ListController>(tag: "closet").refreshData(States.closet);
-    Get.find<ListController>(tag: "laundry").refreshData(States.wash);
+    Get.find<ListController>(tag: "laundry").refreshData(States.laundry);
   }
 
   void hasData() {

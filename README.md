@@ -12,3 +12,16 @@ It can be in 3 main states
 
 ![Flutter](https://img.shields.io/badge/Flutter-%2302569B.svg?style=for-the-badge&logo=Flutter&logoColor=white)
 
+## Database Schema
+
+### Version 1
+
+This is the initial version of the database schema. It is a simple schema with 1 table that holds the state of the clothes.
+
+![Database Schema - Version 1](docs\database_schema\Version_1.png)
+
+### Version 2
+
+The second version of the database schema is a more complex schema with 2 tables. The first table holds the information of the clothes and the second table holds the names of the categories which are linked to the categories.
+
+![Database Schema - Version 2](docs\database_schema\Version_1.png)

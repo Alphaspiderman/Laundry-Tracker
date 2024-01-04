@@ -80,71 +80,74 @@ class ClosetController extends GetxController {
   }
 
   Widget getBody() {
-    if (listController.items.isEmpty) {
-      return const Center(
-        child: Text(
-          "No items in Closet",
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      );
-    }
-    // Return the list view but update as data changes in controller
     return Obx(
-      () => ListView.builder(
-        itemCount: listController.items.length,
-        itemBuilder: (BuildContext context, int index) {
-          DbEntry item = listController.items[index];
-          return Dismissible(
-            key: Key(item.id.toString()),
-            onDismissed: (DismissDirection direction) {
-              if (direction == DismissDirection.endToStart) {
-                moveToLaundry(item.id);
-              } else {
-                moveToBasket(item.id);
-              }
-              // Remove the item from the list
-              removeItem(item.id);
-            },
-            background: Container(
-              color: Colors.green,
-              child: const Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: EdgeInsets.only(left: 20),
-                  child: Icon(
-                    Icons.shopping_basket,
-                    color: Colors.white,
-                  ),
-                ),
+      () {
+        // If the list is empty, show a message
+        if (listController.items.isEmpty) {
+          return const Center(
+            child: Text(
+              "Closet is Empty",
+              style: TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
               ),
-            ),
-            secondaryBackground: Container(
-              color: Colors.red,
-              child: const Align(
-                alignment: Alignment.centerRight,
-                child: Padding(
-                  padding: EdgeInsets.only(right: 20),
-                  child: Icon(
-                    Icons.local_laundry_service,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-            child: DisplayCard(
-              data: item,
-              onFirstButtonPressed: moveToBasket,
-              onSecondButtonPressed: moveToLaundry,
-              onDelete: (int id) async {
-                await deleteEntry(id);
-              },
             ),
           );
-        },
-      ),
+        }
+        // Return the list view but update as data changes in controller
+        return ListView.builder(
+          itemCount: listController.items.length,
+          itemBuilder: (BuildContext context, int index) {
+            DbEntry item = listController.items[index];
+            return Dismissible(
+              key: Key(item.id.toString()),
+              onDismissed: (DismissDirection direction) {
+                if (direction == DismissDirection.endToStart) {
+                  moveToLaundry(item.id);
+                } else {
+                  moveToBasket(item.id);
+                }
+                // Remove the item from the list
+                removeItem(item.id);
+              },
+              background: Container(
+                color: Colors.green,
+                child: const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 20),
+                    child: Icon(
+                      Icons.shopping_basket,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              secondaryBackground: Container(
+                color: Colors.red,
+                child: const Align(
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                    padding: EdgeInsets.only(right: 20),
+                    child: Icon(
+                      Icons.local_laundry_service,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+              child: DisplayCard(
+                data: item,
+                onFirstButtonPressed: moveToBasket,
+                onSecondButtonPressed: moveToLaundry,
+                onDelete: (int id) async {
+                  await deleteEntry(id);
+                },
+              ),
+            );
+          },
+        );
+      },
     );
   }
 

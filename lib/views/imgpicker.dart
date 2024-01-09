@@ -53,7 +53,7 @@ class ImagePickerWidget extends StatelessWidget {
 
       // Create a unique image name
       String safeString = getSafe();
-      String imageName = '${imageFile.path.hashCode}-$safeString.png';
+      String imageName = '${imageFile.path.hashCode}-$safeString.jpg';
 
       // Create folders if do not exist
       await Directory(join(appDir.path, 'temp')).create(recursive: true);
@@ -69,7 +69,7 @@ class ImagePickerWidget extends StatelessWidget {
         String safeString = DateTime.now().microsecond.toString() +
             DateTime.now().second.toString() +
             DateTime.now().minute.toString();
-        imageName = '${imageFile.path.hashCode}-$safeString.png';
+        imageName = '${imageFile.path.hashCode}-$safeString.jpg';
       }
 
       // Create the final paths for the temp and final locations

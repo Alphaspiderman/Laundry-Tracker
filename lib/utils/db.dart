@@ -37,18 +37,65 @@ class DatabaseHelper {
     _database = await openDatabase(
       join(await getDatabasesPath(), 'data.db'),
       onCreate: (db, version) {
-        return db.execute(
+        db.execute(
+          // Create the table to hold infomration about the categories
+          '''
+          CREATE TABLE categories (
+            id INTEGER PRIMARY KEY,
+            name TEXT
+          )
+          ''',
+        );
+        // Create the table to hold information about the clothes
+        db.execute(
           '''
           CREATE TABLE clothes (
             id INTEGER PRIMARY KEY,
             name TEXT,
             state INTEGER,
-            image_path TEXT
+            image_path TEXT,
+            category_id INTEGER,
           )
           ''',
         );
       },
-      version: 1,
+      onUpgrade: (db, oldVersion, newVersion) {
+        // Log the old and new versions
+        log.i("Upgrading database from $oldVersion to $newVersion");
+        if (oldVersion < 2) {
+          // Add the category_id column and set it to 0 for all entries (default category)
+          db.execute(
+            '''
+            ALTER TABLE clothes
+            ADD COLUMN category_id INTEGER DEFAULT 1
+            ''',
+          );
+          // Add the categories table
+          db.execute(
+            '''
+            CREATE TABLE categories (
+              id INTEGER PRIMARY KEY,
+              name TEXT
+            )
+            ''',
+          );
+          // Insert the default category
+          db.insert(
+            'categories',
+            {
+              'name': 'Default',
+            },
+          );
+        }
+      },
+      version: 2,
+    );
+    // Insert the default category
+    _database!.insert(
+      'categories',
+      {
+        'name': 'Default',
+      },
     );
     log.i("Database initialized");
   }
@@ -235,6 +282,13 @@ class DatabaseHelper {
         log.d(f.path);
       }
     }
+
+    // Create a file to hold the database version number
+    final versionFile = File(join(exportDir.path, "version.txt"));
+    // Get the database version
+    final version = await db.getVersion();
+    // Write the version number to the file
+    await versionFile.writeAsString(version.toString());
 
     // Create a ZIP file
     final zipFile = File(join(appDir!.path, "export.zip"));

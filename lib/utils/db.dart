@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:clothes_tracker/models/db_entry.dart';
 import 'package:clothes_tracker/models/state.dart';
+import 'package:clothes_tracker/utils/list_controller.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_archive/flutter_archive.dart';
 import 'package:get/get.dart';
@@ -31,6 +32,13 @@ class DatabaseHelper {
   Future<void> initClass() async {
     appDir = await getApplicationDocumentsDirectory();
     await initDatabase();
+  }
+
+  // Function to refresh all list controllers
+  void refreshAll() {
+    Get.find<ListController>(tag: "basket").refreshData(States.basket);
+    Get.find<ListController>(tag: "closet").refreshData(States.closet);
+    Get.find<ListController>(tag: "laundry").refreshData(States.laundry);
   }
 
   Future<void> initDatabase() async {
@@ -121,6 +129,8 @@ class DatabaseHelper {
         'image_path': imagePathClean,
       },
     );
+    // Refresh all list controllers
+    refreshAll();
   }
 
   Future<List<DbEntry>> fetchData() async {
@@ -228,6 +238,8 @@ class DatabaseHelper {
 
     Get.back();
     Get.snackbar("Import", "Data Imported!");
+    // Refresh all list controllers
+    refreshAll();
   }
 
   // Export data as a ZIP
@@ -319,7 +331,10 @@ class DatabaseHelper {
   // Purge the database
   Future<void> purgeData() async {
     Database db = await database;
+    // Delete all entries
     await db.delete('clothes');
+    await db.delete('categories');
+    // Delete the images directory
     final imagePath = join(appDir!.path, 'images');
     // Check if images directory exists
     if (Directory(imagePath).existsSync()) {
@@ -328,6 +343,10 @@ class DatabaseHelper {
     }
     // Recreate the images directory
     await Directory(imagePath).create();
+    // Recreate the database
+    await initDatabase();
+    // Refresh all list controllers
+    refreshAll();
   }
 
   // Generate a list of DbEntry from a list of maps

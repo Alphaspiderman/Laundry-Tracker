@@ -5,13 +5,14 @@ class DbEntry {
   final String name;
   final States state;
   final String imagePath;
+  final int categoryId;
 
-  DbEntry({
-    required this.id,
-    required this.name,
-    required this.state,
-    required this.imagePath,
-  });
+  DbEntry(
+      {required this.id,
+      required this.name,
+      required this.state,
+      required this.imagePath,
+      required this.categoryId});
 
   // Make a factory constructor to create an Entry from json
   factory DbEntry.fromJson(Map<String, dynamic> json) => DbEntry(
@@ -19,6 +20,7 @@ class DbEntry {
         name: json["name"],
         state: States.values[json["state"]],
         imagePath: json["imagePath"],
+        categoryId: json["categoryId"],
       );
 
   // Make a factory constructor to create an Entry from a map
@@ -27,6 +29,7 @@ class DbEntry {
         name: json["name"],
         state: States.values[json["state"]],
         imagePath: json["prepend"].toString() + json["image_path"].toString(),
+        categoryId: json["category_id"],
       );
 
   // Make a method to convert an Entry to a map
@@ -35,6 +38,7 @@ class DbEntry {
         "name": name,
         "state": state,
         "imagePath": imagePath,
+        "categoryId": categoryId,
       };
 
   // Make a method to convert an Entry to json
@@ -43,5 +47,6 @@ class DbEntry {
         "name": name,
         "state": state.index,
         "imagePath": imagePath,
+        "categoryId": categoryId,
       };
 }

@@ -127,6 +127,7 @@ class DatabaseHelper {
         'name': data.name,
         'state': data.state.index,
         'image_path': imagePathClean,
+        'category_id': data.categoryId,
       },
     );
     // Refresh all list controllers
@@ -201,14 +202,46 @@ class DatabaseHelper {
 
     // Declare the directory for the imported data
     final importDir = Directory(join(appDir!.path, "import"));
-    final importFile = File(join(importDir.path, "data.json"));
+    final importCategoriesFile = File(join(importDir.path, "categories.json"));
+    final importDataFile = File(join(importDir.path, "data.json"));
 
-    // Read JSON file and get a list
-    final data = await importFile.readAsString();
-    List jsondata = json.decode(data);
+    // Read JSON file and get a list of maps
+    final clothesData = await importDataFile.readAsString();
+    List jsondata = json.decode(clothesData);
 
-    // Convert to List
-    List<DbEntry> dataList = jsondata.map((e) => DbEntry.fromJson(e)).toList();
+    // Get database
+    Database db = await database;
+
+    // Declare the list of DbEntry
+    List<DbEntry> dataList = [];
+
+    // Check if the categories file exists
+    if (importCategoriesFile.existsSync()) {
+      // Read JSON file and get a list of maps
+      final categoriesData = await importCategoriesFile.readAsString();
+      List jsonCategories = json.decode(categoriesData);
+      // Save the categories to the database
+      for (var category in jsonCategories) {
+        await db.insert('categories', {
+          'id': category['id'],
+          'name': category['name'],
+        });
+      }
+
+      // Set autoincrement to the next available ID
+      await db.execute(
+          "UPDATE SQLITE_SEQUENCE SET SEQ=MAX(id) WHERE NAME='categories'");
+
+      // Convert to List of DbEntry
+      dataList = jsondata.map((e) => DbEntry.fromJson(e)).toList();
+    } else {
+      // Set the category_id to 1 for all entries
+      for (var data in jsondata) {
+        data['categoryId'] = 1;
+      }
+      // Convert to List of DbEntry
+      dataList = jsondata.map((e) => DbEntry.fromJson(e)).toList();
+    }
 
     // Declare the directory for images
     final imagesDir = Directory(join(appDir!.path, "images"));
@@ -219,13 +252,13 @@ class DatabaseHelper {
       await imagesDir.create(recursive: true);
     }
 
-    Database db = await database;
     // Insert data into the database and copy image
     for (DbEntry data in dataList) {
       await db.insert('clothes', {
         'name': data.name,
         'state': data.state.index,
         'image_path': data.imagePath,
+        'category_id': data.categoryId,
       });
 
       final importImagePath = importImagesDir.path + data.imagePath;
@@ -261,6 +294,17 @@ class DatabaseHelper {
 
     // Get database
     Database db = await database;
+
+    // Query for all categories
+    final List<Map<String, dynamic>> categories = await db.query('categories');
+
+    // Convert to JSON
+    String jsonCategories =
+        jsonEncode(categories.map((e) => e).toList()).toString();
+
+    // Write JSON to file
+    final exportCategoriesFile = File(join(exportDir.path, "categories.json"));
+    await exportCategoriesFile.writeAsString(jsonCategories);
 
     // Query for all entries
     final List<Map<String, dynamic>> maps = await db.query('clothes');

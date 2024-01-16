@@ -98,13 +98,11 @@ class DatabaseHelper {
       },
       version: 2,
     );
-    // Insert the default category
-    _database!.insert(
-      'categories',
-      {
-        'name': 'Default',
-      },
-    );
+    // Check if the default category exists
+    if (!await checkCategory("Default")) {
+      // Insert the default category
+      await addCategory("Default");
+    }
     log.i("Database initialized");
   }
 
@@ -153,6 +151,18 @@ class DatabaseHelper {
     return generateList(maps);
   }
 
+  // Fetch data by category
+  Future<List<DbEntry>> fetchDataByCategory(int categoryId) async {
+    Database db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'clothes',
+      where: 'category_id = ?',
+      whereArgs: [categoryId],
+    );
+
+    return generateList(maps);
+  }
+
   // Update State
   Future<void> updateState(int id, States state) async {
     Database db = await database;
@@ -160,6 +170,17 @@ class DatabaseHelper {
     await db.update(
       'clothes',
       {'state': dbState},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  // Update Category
+  Future<void> updateCategory(int id, int categoryId) async {
+    Database db = await database;
+    await db.update(
+      'clothes',
+      {'category_id': categoryId},
       where: 'id = ?',
       whereArgs: [id],
     );
@@ -187,6 +208,64 @@ class DatabaseHelper {
       whereArgs: [id],
     );
     await File(dataEntry.imagePath).delete();
+  }
+
+  // Add a category
+  Future<void> addCategory(String name) async {
+    Database db = await database;
+    // Insert the category
+    await db.insert(
+      'categories',
+      {
+        'name': name,
+      },
+    );
+  }
+
+  // Fetch all categories
+  Future<List<Map<String, dynamic>>> fetchCategories() async {
+    Database db = await database;
+    // Query for all categories
+    final List<Map<String, dynamic>> maps = await db.query('categories');
+    // log the categories
+    log.d("Categories: $maps");
+    return maps;
+  }
+
+  // Check if a category exists
+  Future<bool> checkCategory(String text) {
+    Database db = _database!;
+    // Query for the category
+    return db.query(
+      'categories',
+      where: 'name = ?',
+      whereArgs: [text],
+    ).then((value) {
+      // If the category exists, return true
+      if (value.isNotEmpty) {
+        return true;
+      }
+      // If the category doesn't exist, return false
+      return false;
+    });
+  }
+
+  // Delete a category
+  Future<void> deleteCategory(int id) async {
+    Database db = await database;
+    // Delete the category
+    await db.delete(
+      'categories',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    // Update the category_id of all entries with the deleted category
+    await db.update(
+      'clothes',
+      {'category_id': 1},
+      where: 'category_id = ?',
+      whereArgs: [id],
+    );
   }
 
   // Import data

@@ -12,7 +12,10 @@ class DataCaptureScreen extends StatefulWidget {
   // Get a callback when data is saved
   final Function() hasData;
 
-  const DataCaptureScreen({super.key, required this.hasData});
+  const DataCaptureScreen({
+    super.key,
+    required this.hasData,
+  });
 
   @override
   // ignore: library_private_types_in_public_api
@@ -29,6 +32,18 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
   int itemstate = 0;
   String? imagePath;
   File? imageFile;
+  int? categoryId;
+  List<Map<String, dynamic>> categories = [];
+
+  @override
+  void initState() {
+    super.initState();
+    dbHelper.fetchCategories().then((value) {
+      setState(() {
+        categories = value;
+      });
+    });
+  }
 
   void _receiveImageName(String basePath, String imageName) {
     setState(() {
@@ -59,6 +74,25 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                 height: 200,
                 child: Image.file(imageFile!),
               ),
+            // Dropdown to select the category
+            DropdownButtonFormField(
+              value: categoryId,
+              decoration: const InputDecoration(labelText: 'Category'),
+              items: categories
+                  .map(
+                    (category) => DropdownMenuItem(
+                      value: category['id'],
+                      child: Text(category['name']),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (value) {
+                setState(() {
+                  categoryId = value as int;
+                });
+              },
+            ),
+            const SizedBox(height: 16.0),
             DropdownButtonFormField(
               value: States.closet,
               decoration: const InputDecoration(labelText: 'State'),
@@ -83,16 +117,37 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
             const SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () async {
-                if (imageFile != null) {
+                if (imageFile != null &&
+                    categoryId != null &&
+                    _nameController.text.isNotEmpty) {
                   DbEntry capturedData = DbEntry(
                     id: 0,
                     name: _nameController.text,
                     state: States.values[itemstate],
                     imagePath: imagePath!,
+                    categoryId: categoryId!,
                   );
                   await dbHelper.insertData(capturedData, imageFile!);
                   hasData();
                   Get.back(closeOverlays: true);
+                } else if (imageFile == null) {
+                  Get.snackbar(
+                    'Error',
+                    'Please select an image',
+                    duration: const Duration(seconds: 1),
+                  );
+                } else if (categoryId == null) {
+                  Get.snackbar(
+                    'Error',
+                    'Please select a category',
+                    duration: const Duration(seconds: 1),
+                  );
+                } else if (_nameController.text.isEmpty) {
+                  Get.snackbar(
+                    'Error',
+                    'Please enter a name',
+                    duration: const Duration(seconds: 1),
+                  );
                 }
               },
               child: const Text('Save Data'),

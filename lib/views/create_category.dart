@@ -1,3 +1,4 @@
+import 'package:clothes_tracker/models/category.dart';
 import 'package:clothes_tracker/utils/db.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -55,7 +56,17 @@ class _CreateCategoryState extends State<CreateCategory> {
                 }
                 // Create the category
                 await dbHelper.addCategory(_nameController.text);
+                // Refresh the list
+                List<Category> list = await dbHelper.fetchCategories();
+                Get.find<List<Category>>().assignAll(list);
+                // Go back to the previous screen
                 Get.back();
+                // Show a notification
+                Get.snackbar(
+                  'Success',
+                  'Category created successfully',
+                  duration: const Duration(seconds: 1),
+                );
               },
               child: const Text("Create"),
             ),

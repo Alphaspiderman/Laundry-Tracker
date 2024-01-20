@@ -16,8 +16,6 @@ import 'package:logger/logger.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
-import 'models/state.dart';
-
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
@@ -67,16 +65,18 @@ void main() async {
 
   Get.put(db);
 
+  // Initialise the lists
+  Get.put(ListController(), tag: "closet");
+  Get.put(ListController(), tag: "basket");
+  Get.put(ListController(), tag: "laundry");
+
   runApp(const MyApp());
 
-  ListController closetList = Get.put(ListController(), tag: "closet");
-  ListController basketList = Get.put(ListController(), tag: "basket");
-  ListController washList = Get.put(ListController(), tag: "laundry");
+  // Categories list from database
+  Get.put(await db.fetchCategories(), permanent: true);
 
-  // Fetch data for each list
-  closetList.refreshData(States.closet);
-  basketList.refreshData(States.basket);
-  washList.refreshData(States.laundry);
+  // Refresh all lists using the database
+  db.refreshAll();
 }
 
 class MyApp extends StatelessWidget {

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:clothes_tracker/models/category.dart';
 import 'package:clothes_tracker/models/db_entry.dart';
 import 'package:clothes_tracker/models/state.dart';
 import 'package:clothes_tracker/utils/db.dart';
@@ -33,7 +34,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
   String? imagePath;
   File? imageFile;
   int? categoryId;
-  List<Map<String, dynamic>> categories = [];
+  List<Category> categories = [];
 
   @override
   void initState() {
@@ -81,8 +82,8 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
               items: categories
                   .map(
                     (category) => DropdownMenuItem(
-                      value: category['id'],
-                      child: Text(category['name']),
+                      value: category.id,
+                      child: Text(category.name),
                     ),
                   )
                   .toList(),

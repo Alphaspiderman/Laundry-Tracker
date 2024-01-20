@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:clothes_tracker/models/category.dart';
 import 'package:clothes_tracker/models/db_entry.dart';
 import 'package:clothes_tracker/models/state.dart';
 import 'package:clothes_tracker/utils/list_controller.dart';
@@ -223,13 +224,18 @@ class DatabaseHelper {
   }
 
   // Fetch all categories
-  Future<List<Map<String, dynamic>>> fetchCategories() async {
+  Future<List<Category>> fetchCategories() async {
     Database db = await database;
     // Query for all categories
     final List<Map<String, dynamic>> maps = await db.query('categories');
-    // log the categories
-    log.d("Categories: $maps");
-    return maps;
+    log.i("Categories: $maps");
+    // Convert to List of Category
+    return List.generate(maps.length, (index) {
+      return Category(
+        id: maps[index]['id'],
+        name: maps[index]['name'],
+      );
+    });
   }
 
   // Check if a category exists

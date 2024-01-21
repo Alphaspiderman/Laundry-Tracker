@@ -1,6 +1,6 @@
 import 'package:clothes_tracker/models/db_entry.dart';
 import 'package:clothes_tracker/models/state.dart';
-import 'package:clothes_tracker/ui/display_card.dart';
+import 'package:clothes_tracker/ui/debug_card.dart';
 import 'package:clothes_tracker/utils/db.dart';
 import 'package:clothes_tracker/utils/list_controller.dart';
 import 'package:flutter/material.dart';
@@ -25,58 +25,6 @@ class DebugController extends GetxController {
     update();
   }
 
-  void moveToCloset(int id) async {
-    // Use the updateState on database
-    await dbHelper.updateState(
-      id,
-      States.closet,
-    );
-    // Remove from list
-    refreshLists(id);
-    // Show a notification
-    Get.snackbar(
-      'Success',
-      'Item moved to Closet',
-      duration: const Duration(seconds: 1),
-    );
-    // Update the view
-    update();
-  }
-
-  void moveToBasket(int id) async {
-    // Use the updateState on database
-    await dbHelper.updateState(
-      id,
-      States.basket,
-    );
-    // Remove from list
-    refreshLists(id);
-    // Show a notification
-    Get.snackbar(
-      'Success',
-      'Item moved to Basket',
-      duration: const Duration(seconds: 1),
-    );
-    // Update the view
-    update();
-  }
-
-  void moveToLaundry(int id) async {
-    // Use the updateState on database
-    await dbHelper.updateState(
-      id,
-      States.laundry,
-    );
-    // Show a notification
-    Get.snackbar(
-      'Success',
-      'Item moved to Laundry',
-      duration: const Duration(seconds: 1),
-    );
-    // Rebuild the view
-    update();
-  }
-
   FutureBuilder getBody() {
     return FutureBuilder(
       future: dbHelper.fetchData(),
@@ -97,14 +45,11 @@ class DebugController extends GetxController {
             itemCount: dataList.length,
             itemBuilder: (context, index) {
               // return a display card
-              return DisplayCard(
+              return DebugCard(
                 data: dataList[index],
-                onFirstButtonPressed: moveToCloset,
-                onSecondButtonPressed: moveToBasket,
                 onDelete: (int id) async {
                   await deleteEntry(id);
                 },
-                onThirdButtonPressed: moveToLaundry,
               );
             },
           );

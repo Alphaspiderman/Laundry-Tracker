@@ -1,3 +1,4 @@
+import 'package:clothes_tracker/models/category.dart';
 import 'package:clothes_tracker/models/db_entry.dart';
 import 'package:clothes_tracker/models/state.dart';
 import 'package:clothes_tracker/ui/display_card.dart';
@@ -9,14 +10,7 @@ import 'package:get/get.dart';
 class LaundryController extends GetxController {
   final DatabaseHelper dbHelper = Get.find();
   final ListController listController = Get.find(tag: "laundry");
-
-  // Function to update the list in the controller
-  Future<void> refreshData() async {
-    // Get the data from the database
-    final List<DbEntry> data = await dbHelper.fetchDataByState(States.laundry);
-    // Update the list in the controller
-    listController.items.value = data;
-  }
+  final List<Category> categories = Get.find();
 
   // Function to remove an item from the list by its ID
   void removeItem(int id) {
@@ -29,9 +23,7 @@ class LaundryController extends GetxController {
       }
     }
     // Get and refresh all list controllers
-    Get.find<ListController>(tag: "basket").refreshData(States.basket);
-    Get.find<ListController>(tag: "closet").refreshData(States.closet);
-    Get.find<ListController>(tag: "laundry").refreshData(States.laundry);
+    dbHelper.refreshAll();
   }
 
   void hasData() {
@@ -40,7 +32,6 @@ class LaundryController extends GetxController {
       'Data saved successfully',
       duration: const Duration(seconds: 1),
     );
-    update();
   }
 
   void moveToBasket(int id) async {
@@ -57,8 +48,6 @@ class LaundryController extends GetxController {
       'Item moved to Basket',
       duration: const Duration(seconds: 1),
     );
-    // Update the view
-    update();
   }
 
   void moveToCloset(int id) async {
@@ -75,8 +64,6 @@ class LaundryController extends GetxController {
       'Item moved to Closet',
       duration: const Duration(seconds: 1),
     );
-    // Rebuild the view
-    update();
   }
 
   Widget getBody() {
@@ -94,56 +81,80 @@ class LaundryController extends GetxController {
             ),
           );
         }
-        // Return the list view but update as data changes in controller
+        // Return a list of expansion tiles for each categories with cards inside
         return ListView.builder(
-          itemCount: listController.items.length,
-          itemBuilder: (BuildContext context, int index) {
-            DbEntry item = listController.items[index];
-            return Dismissible(
-              key: Key(item.id.toString()),
-              onDismissed: (DismissDirection direction) {
-                if (direction == DismissDirection.endToStart) {
-                  moveToBasket(item.id);
-                } else {
-                  moveToCloset(item.id);
-                }
-                // Remove the item from the list
-                removeItem(item.id);
-              },
-              background: Container(
-                color: Colors.green,
-                child: const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 20),
-                    child: Icon(
-                      Icons.door_sliding_rounded,
-                      color: Colors.white,
-                    ),
-                  ),
+          itemCount: categories.length,
+          itemBuilder: (context, idx) {
+            Category category = categories[idx];
+            return ExpansionTile(
+              initiallyExpanded: true,
+              title: Text(
+                category.name,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              secondaryBackground: Container(
-                color: Colors.red,
-                child: const Align(
-                  alignment: Alignment.centerRight,
-                  child: Padding(
-                    padding: EdgeInsets.only(right: 20),
-                    child: Icon(
-                      Icons.shopping_basket,
-                      color: Colors.white,
-                    ),
-                  ),
+              children: [
+                ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: listController.items.length,
+                  itemBuilder: (context, index) {
+                    DbEntry item = listController.items[index];
+                    if (item.categoryId == category.id) {
+                      return Dismissible(
+                        key: Key(item.id.toString()),
+                        onDismissed: (DismissDirection direction) {
+                          if (direction == DismissDirection.endToStart) {
+                            moveToBasket(item.id);
+                          } else {
+                            moveToCloset(item.id);
+                          }
+                          // Remove the item from the list
+                          removeItem(item.id);
+                        },
+                        background: Container(
+                          color: Colors.green,
+                          child: const Align(
+                            alignment: Alignment.centerLeft,
+                            child: Padding(
+                              padding: EdgeInsets.only(left: 20),
+                              child: Icon(
+                                Icons.door_sliding_rounded,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                        secondaryBackground: Container(
+                          color: Colors.red,
+                          child: const Align(
+                            alignment: Alignment.centerRight,
+                            child: Padding(
+                              padding: EdgeInsets.only(right: 20),
+                              child: Icon(
+                                Icons.shopping_basket,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                        child: DisplayCard(
+                          data: item,
+                          onFirstButtonPressed: moveToBasket,
+                          onSecondButtonPressed: moveToCloset,
+                          onDelete: (int id) async {
+                            await deleteEntry(id);
+                          },
+                        ),
+                      );
+                    } else {
+                      return const SizedBox();
+                    }
+                  },
                 ),
-              ),
-              child: DisplayCard(
-                data: item,
-                onFirstButtonPressed: moveToBasket,
-                onSecondButtonPressed: moveToCloset,
-                onDelete: (int id) async {
-                  await deleteEntry(id);
-                },
-              ),
+              ],
             );
           },
         );
@@ -169,11 +180,11 @@ class LaundryController extends GetxController {
             onPressed: () async {
               Get.back();
               await dbHelper.deleteData(id);
+              dbHelper.refreshAll();
               Get.snackbar(
                 "Deletion",
                 "Entry Deleted!",
               );
-              update();
             },
             child: const Text("YES"),
           ),

@@ -129,6 +129,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                     categoryId: categoryId!,
                   );
                   await dbHelper.insertData(capturedData, imageFile!);
+                  dbHelper.refreshAll();
                   hasData();
                   Get.back(closeOverlays: true);
                 } else if (imageFile == null) {

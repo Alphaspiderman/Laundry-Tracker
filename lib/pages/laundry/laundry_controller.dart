@@ -140,14 +140,7 @@ class LaundryController extends GetxController {
                             ),
                           ),
                         ),
-                        child: DisplayCard(
-                          data: item,
-                          onFirstButtonPressed: moveToBasket,
-                          onSecondButtonPressed: moveToCloset,
-                          onDelete: (int id) async {
-                            await deleteEntry(id);
-                          },
-                        ),
+                        child: DisplayCard(data: item),
                       );
                     } else {
                       return const SizedBox();

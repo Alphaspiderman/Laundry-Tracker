@@ -138,14 +138,7 @@ class BasketController extends GetxController {
                             ),
                           ),
                         ),
-                        child: DisplayCard(
-                          data: item,
-                          onFirstButtonPressed: moveToCloset,
-                          onSecondButtonPressed: moveToLaundry,
-                          onDelete: (int id) async {
-                            await deleteEntry(id);
-                          },
-                        ),
+                        child: DisplayCard(data: item),
                       );
                     } else {
                       return const SizedBox();

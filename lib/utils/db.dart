@@ -257,7 +257,11 @@ class DatabaseHelper {
   }
 
   // Delete a category
-  Future<void> deleteCategory(int id) async {
+  Future<bool> deleteCategory(int id) async {
+    // Make sure its not the default category
+    if (id == 1) {
+      return false;
+    }
     Database db = await database;
     // Delete the category
     await db.delete(
@@ -272,6 +276,7 @@ class DatabaseHelper {
       where: 'category_id = ?',
       whereArgs: [id],
     );
+    return true;
   }
 
   // Import data

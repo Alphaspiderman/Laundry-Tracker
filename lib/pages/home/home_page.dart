@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:clothes_tracker/navigation/navgation_bar.dart';
 import 'package:clothes_tracker/ui/app_bar.dart';
 import 'package:clothes_tracker/utils/db.dart';
-import 'package:clothes_tracker/views/create_category.dart';
+import 'package:clothes_tracker/pages/categories/manage_category_page.dart';
 import 'package:clothes_tracker/views/create_entry.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -188,7 +188,7 @@ class _HomePageState extends State<HomePage> {
                     onPressed: () {
                       Get.to(() => const CreateCategory());
                     },
-                    child: const Text('Add Category'),
+                    child: const Text('Manage Categories'),
                   ),
                   // Add a button to import data
                   OutlinedButton(

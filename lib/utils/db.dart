@@ -529,4 +529,16 @@ class DatabaseHelper {
 
     return stats;
   }
+
+  Future<void> updateName(int id, String value) async {
+    // Update the name for the entry
+    Database db = await database;
+
+    await db.update(
+      'clothes',
+      {'name': value},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
 }

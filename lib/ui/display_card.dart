@@ -4,6 +4,7 @@ import 'package:clothes_tracker/models/db_entry.dart';
 import 'package:clothes_tracker/models/state.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:clothes_tracker/ui/card_dropdown.dart';
 
 class DisplayCard extends StatelessWidget {
   final DbEntry data;
@@ -35,6 +36,7 @@ class DisplayCard extends StatelessWidget {
               titleTextStyle: const TextStyle(
                 fontSize: 26,
               ),
+              trailing: CardDropdown(entry: data),
             ),
             GestureDetector(
               onTap: () {

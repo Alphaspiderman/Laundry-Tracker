@@ -15,11 +15,13 @@ class _NavBarState extends State<NavBar> {
   @override
   Widget build(BuildContext context) {
     if (widget.showDebug) {
-      // Add debug page option in NavBar
-      navBarItems.removeLast();
-      navBarItems.add(
+      // Remove the empty space in the center
+      navBarItems.removeAt(2);
+      // Add debug page option in the center
+      navBarItems.insert(
+        2,
         IconButton(
-          icon: const Icon(Icons.developer_mode),
+          icon: const Icon(Icons.bug_report),
           tooltip: "Debug",
           onPressed: () => Get.offAllNamed('/debug'),
         ),

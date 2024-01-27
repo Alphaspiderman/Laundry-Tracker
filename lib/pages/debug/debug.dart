@@ -1,7 +1,6 @@
 import 'package:clothes_tracker/navigation/navgation_bar.dart';
 import 'package:clothes_tracker/pages/debug/debug_controller.dart';
 import 'package:clothes_tracker/ui/app_bar.dart';
-import 'package:clothes_tracker/views/create_entry.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -47,15 +46,7 @@ class _DebugPageState extends State<DebugPage> {
         },
         body: debugController.getBody(),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton(
-        shape: const CircleBorder(),
-        child: const Icon(Icons.add),
-        onPressed: () async {
-          Get.to(() => DataCaptureScreen(hasData: _hasData));
-        },
-      ),
-      bottomNavigationBar: const NavBar(itemIndex: 4, showDebug: true),
+      bottomNavigationBar: const NavBar(itemIndex: 2, showDebug: true),
     );
   }
 }

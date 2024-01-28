@@ -70,7 +70,7 @@ void main() async {
   Get.put(ListController(), tag: "basket");
   Get.put(ListController(), tag: "laundry");
 
-  runApp(const MyApp());
+  runApp(const LaundryApp());
 
   // Categories list from database
   Get.put(await db.fetchCategories(), permanent: true);
@@ -79,8 +79,8 @@ void main() async {
   db.refreshAll();
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class LaundryApp extends StatelessWidget {
+  const LaundryApp({super.key});
 
   // This widget is the root of your application.
   @override

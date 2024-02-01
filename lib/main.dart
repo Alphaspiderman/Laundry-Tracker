@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:clothes_tracker/pages/basket/basket_page.dart';
+import 'package:clothes_tracker/pages/categories/manage_category_page.dart';
 import 'package:clothes_tracker/pages/closet/closet_page.dart';
 import 'package:clothes_tracker/pages/debug/debug.dart';
 import 'package:clothes_tracker/pages/home/home_page.dart';
@@ -99,6 +100,7 @@ class LaundryApp extends StatelessWidget {
         GetPage(name: '/basket', page: () => const BasketPage()),
         GetPage(name: '/laundry', page: () => const LaundryPage()),
         GetPage(name: '/debug', page: () => const DebugPage()),
+        GetPage(name: '/categories', page: () => const ManageCategoryPage()),
       ],
     );
   }

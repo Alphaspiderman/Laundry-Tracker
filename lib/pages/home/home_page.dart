@@ -1,11 +1,8 @@
-import 'dart:io';
-
 import 'package:clothes_tracker/navigation/navgation_bar.dart';
 import 'package:clothes_tracker/ui/app_bar.dart';
+import 'package:clothes_tracker/ui/drawer.dart';
 import 'package:clothes_tracker/utils/db.dart';
-import 'package:clothes_tracker/pages/categories/manage_category_page.dart';
 import 'package:clothes_tracker/views/create_entry.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
@@ -40,90 +37,10 @@ class _HomePageState extends State<HomePage> {
     setState(() {});
   }
 
-  void confirmDbPurge() {
-    Get.dialog(
-      AlertDialog(
-        title: const Text("Confirm Action"),
-        content: const Text(
-          "This will delete all data from the database!!",
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Get.back();
-              log.d("DB Purge cancelled");
-            },
-            child: const Text("NO"),
-          ),
-          TextButton(
-            onPressed: () async {
-              Get.back();
-              await dbHelper.purgeData();
-              Get.snackbar("Purge", "DB Purged!");
-              log.d("DB Purged");
-            },
-            child: const Text("YES"),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void importData() async {
-    // Pick a file from the device
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
-
-    if (result == null) {
-      // User canceled the picker
-      Get.snackbar("Import Failed", "No file selected!");
-      log.i("Import failed: No file selected");
-      return;
-    }
-    // Get the file path
-    String path = result.files.single.path!;
-    // Confirm its a ZIP file
-    if (!path.endsWith(".zip")) {
-      Get.snackbar("Import Failed", "Invalid file type!");
-      log.i("Import failed: Invalid file type");
-      return;
-    } else {
-      // Create a popup with a message and yes-no buttons
-      Get.dialog(
-        AlertDialog(
-          title: const Text("Confirm Action"),
-          content: const Text(
-            "Local data will be removed before import is attempted!! \nIn case of failed import, existing data will not be restored",
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Get.back();
-                log.d("Import cancelled");
-              },
-              child: const Text("NO"),
-            ),
-            TextButton(
-              onPressed: () async {
-                Get.back();
-                log.d("Importing data from $path");
-                await dbHelper.importData(File(path));
-              },
-              child: const Text("YES"),
-            ),
-          ],
-        ),
-      );
-    }
-  }
-
-  // Function to export all data of the app as ZIP
-  void exportData() async {
-    await dbHelper.exportData();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: AppDrawer(),
       body: NestedScrollView(
         floatHeaderSlivers: true,
         headerSliverBuilder: (BuildContext context, bool isScrolled) {
@@ -166,45 +83,6 @@ class _HomePageState extends State<HomePage> {
                     return const CircularProgressIndicator();
                   }
                 },
-              ),
-              Column(
-                children: [
-                  // Add a button to purge the DB
-                  OutlinedButton(
-                    onPressed: () async {
-                      confirmDbPurge();
-                    },
-                    child: const Text('Purge DB'),
-                  ),
-                  // Add a button to toggle debug page
-                  OutlinedButton(
-                    onPressed: () {
-                      Get.offAllNamed('/debug');
-                    },
-                    child: const Text('Debug Page'),
-                  ),
-                  // Add a button to add a new category
-                  OutlinedButton(
-                    onPressed: () {
-                      Get.to(() => const CreateCategory());
-                    },
-                    child: const Text('Manage Categories'),
-                  ),
-                  // Add a button to import data
-                  OutlinedButton(
-                    onPressed: () {
-                      importData();
-                    },
-                    child: const Text('Import Data'),
-                  ),
-                  // Add a button to export data
-                  OutlinedButton(
-                    onPressed: () {
-                      exportData();
-                    },
-                    child: const Text('Export Data'),
-                  ),
-                ],
               ),
             ],
           ),

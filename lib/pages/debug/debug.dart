@@ -1,6 +1,7 @@
 import 'package:clothes_tracker/navigation/navgation_bar.dart';
 import 'package:clothes_tracker/pages/debug/debug_controller.dart';
 import 'package:clothes_tracker/ui/app_bar.dart';
+import 'package:clothes_tracker/ui/drawer.dart';
 import 'package:flutter/material.dart';
 
 class DebugPage extends StatefulWidget {
@@ -25,6 +26,7 @@ class _DebugPageState extends State<DebugPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: AppDrawer(),
       body: NestedScrollView(
         floatHeaderSlivers: true,
         headerSliverBuilder: (BuildContext context, bool isScrolled) {

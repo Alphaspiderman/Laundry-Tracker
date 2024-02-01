@@ -1,6 +1,7 @@
 import 'package:clothes_tracker/navigation/navgation_bar.dart';
 import 'package:clothes_tracker/pages/laundry/laundry_controller.dart';
 import 'package:clothes_tracker/ui/app_bar.dart';
+import 'package:clothes_tracker/ui/drawer.dart';
 import 'package:clothes_tracker/views/create_entry.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -36,6 +37,7 @@ class _LaundryPageState extends State<LaundryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: AppDrawer(),
       body: NestedScrollView(
         floatHeaderSlivers: true,
         headerSliverBuilder: (BuildContext context, bool isScrolled) {

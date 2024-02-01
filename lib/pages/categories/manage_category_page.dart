@@ -4,15 +4,15 @@ import 'package:clothes_tracker/utils/db.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class CreateCategory extends StatefulWidget {
-  const CreateCategory({super.key});
+class ManageCategoryPage extends StatefulWidget {
+  const ManageCategoryPage({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
-  _CreateCategoryState createState() => _CreateCategoryState();
+  _ManageCategoryPageState createState() => _ManageCategoryPageState();
 }
 
-class _CreateCategoryState extends State<CreateCategory> {
+class _ManageCategoryPageState extends State<ManageCategoryPage> {
   final CategoriesController categoryController = CategoriesController();
 
   final TextEditingController _nameController = TextEditingController();

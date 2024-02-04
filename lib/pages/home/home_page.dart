@@ -1,7 +1,7 @@
 import 'package:clothes_tracker/navigation/navgation_bar.dart';
+import 'package:clothes_tracker/pages/home/home_controller.dart';
 import 'package:clothes_tracker/ui/app_bar.dart';
 import 'package:clothes_tracker/ui/drawer.dart';
-import 'package:clothes_tracker/utils/db.dart';
 import 'package:clothes_tracker/views/create_entry.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -17,14 +17,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late final DatabaseHelper dbHelper;
   final Logger log = Get.find();
+
+  final HomeController homeController = HomeController();
 
   @override
   void initState() {
     FlutterNativeSplash.remove();
     super.initState();
-    dbHelper = Get.find();
   }
 
   void _hasData() {
@@ -40,7 +40,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: AppDrawer(),
+      drawer: const AppDrawer(),
       body: NestedScrollView(
         floatHeaderSlivers: true,
         headerSliverBuilder: (BuildContext context, bool isScrolled) {
@@ -51,40 +51,16 @@ class _HomePageState extends State<HomePage> {
           ];
         },
         body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              // Show statistics of the app
-              FutureBuilder(
-                future: dbHelper.getStats(),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return Column(
-                      children: [
-                        Text(
-                          "Total Items: ${snapshot.data!["Total"]}",
-                          style: const TextStyle(fontSize: 20),
-                        ),
-                        Text(
-                          "In Closet: ${snapshot.data!["Closet"]}",
-                          style: const TextStyle(fontSize: 20),
-                        ),
-                        Text(
-                          "In Basket: ${snapshot.data!["Basket"]}",
-                          style: const TextStyle(fontSize: 20),
-                        ),
-                        Text(
-                          "In Wash: ${snapshot.data!["Wash"]}",
-                          style: const TextStyle(fontSize: 20),
-                        ),
-                      ],
-                    );
-                  } else {
-                    return const CircularProgressIndicator();
-                  }
-                },
-              ),
-            ],
+          child: FutureBuilder<Column>(
+            future: homeController.getBody(),
+            builder: (BuildContext context, AsyncSnapshot<Column> snapshot) {
+              if (snapshot.hasData) {
+                return snapshot.data!;
+              } else if (snapshot.hasError) {
+                return Text("${snapshot.error}");
+              }
+              return const CircularProgressIndicator();
+            },
           ),
         ),
       ),

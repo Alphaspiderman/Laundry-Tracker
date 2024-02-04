@@ -42,6 +42,18 @@ class DatabaseHelper {
     Get.find<ListController>(tag: "laundry").refreshData(States.laundry);
   }
 
+  Future<void> refreshCategory() async {
+    // Check if the category list is in GetX
+    if (!Get.isRegistered<List<Category>>()) {
+      return;
+    }
+    List<Category> categories = Get.find();
+    // Load categories from database
+    List<Category> dbCategories = await fetchCategories();
+    // Replace the old list with the new list
+    categories.assignAll(dbCategories);
+  }
+
   Future<void> initDatabase() async {
     _database = await openDatabase(
       join(await getDatabasesPath(), 'data.db'),
@@ -63,7 +75,21 @@ class DatabaseHelper {
             name TEXT,
             state INTEGER,
             image_path TEXT,
-            category_id INTEGER,
+            category_id INTEGER
+          )
+          ''',
+        );
+        // Create the table to track quantity of misc_clothes
+        db.execute(
+          '''
+          CREATE TABLE misc_clothes (
+            id INTEGER PRIMARY KEY,
+            name TEXT,
+            closet INTEGER DEFAULT 0,
+            basket INTEGER DEFAULT 0,
+            wash INTEGER DEFAULT 0,
+            total INTEGER DEFAULT 0,
+            CHECK (total = closet + basket + wash)
           )
           ''',
         );
@@ -88,6 +114,20 @@ class DatabaseHelper {
             )
             ''',
           );
+          // Insert the misc_clothes table
+          db.execute(
+            '''
+              CREATE TABLE misc_clothes (
+                id INTEGER PRIMARY KEY,
+                name TEXT,
+                closet INTEGER DEFAULT 0,
+                basket INTEGER DEFAULT 0,
+                wash INTEGER DEFAULT 0,
+                total INTEGER DEFAULT 0,
+                CHECK (total = closet + basket + wash)
+              )
+            ''',
+          );
           // Insert the default category
           db.insert(
             'categories',
@@ -103,6 +143,21 @@ class DatabaseHelper {
     if (!await checkCategory("Default")) {
       // Insert the default category
       await addCategory("Default");
+    }
+    // Check if the misc_clothes table is empty
+    final List<Map<String, dynamic>> miscClothes =
+        await _database!.query('misc_clothes');
+    if (miscClothes.isEmpty) {
+      // Insert default values
+      await _database!.insert('misc_clothes', {
+        'name': 'Top Innerwear',
+      });
+      await _database!.insert('misc_clothes', {
+        'name': 'Bottom Innerwear',
+      });
+      await _database!.insert('misc_clothes', {
+        'name': 'Socks',
+      });
     }
     log.i("Database initialized");
   }
@@ -185,6 +240,7 @@ class DatabaseHelper {
       where: 'id = ?',
       whereArgs: [id],
     );
+    await refreshCategory();
   }
 
   // Delete a card
@@ -221,6 +277,7 @@ class DatabaseHelper {
         'name': name,
       },
     );
+    await refreshCategory();
   }
 
   // Fetch all categories
@@ -276,6 +333,7 @@ class DatabaseHelper {
       where: 'category_id = ?',
       whereArgs: [id],
     );
+    await refreshCategory();
     return true;
   }
 
@@ -294,6 +352,8 @@ class DatabaseHelper {
     final importDir = Directory(join(appDir!.path, "import"));
     final importCategoriesFile = File(join(importDir.path, "categories.json"));
     final importDataFile = File(join(importDir.path, "data.json"));
+    final importMiscClothesFile =
+        File(join(importDir.path, "misc_clothes.json"));
 
     // Read JSON file and get a list of maps
     final clothesData = await importDataFile.readAsString();
@@ -312,6 +372,10 @@ class DatabaseHelper {
       List jsonCategories = json.decode(categoriesData);
       // Save the categories to the database
       for (var category in jsonCategories) {
+        // Prevent the default category from being imported
+        if (category['id'] == 1) {
+          continue;
+        }
         await db.insert('categories', {
           'id': category['id'],
           'name': category['name'],
@@ -354,6 +418,43 @@ class DatabaseHelper {
       final importImagePath = importImagesDir.path + data.imagePath;
       final saveImagePath = appDir!.path + data.imagePath;
       await File(importImagePath).copy(saveImagePath);
+    }
+
+    // Check if the misc_clothes export file exists
+    if (importMiscClothesFile.existsSync()) {
+      // Read JSON file and get a list of maps
+      final miscClothesData = await importMiscClothesFile.readAsString();
+      List jsonMiscClothes = json.decode(miscClothesData);
+      // Save the categories to the database
+      for (var miscClothes in jsonMiscClothes) {
+        await db.insert(
+          'misc_clothes',
+          {
+            'id': miscClothes['id'],
+            'name': miscClothes['name'],
+            'closet': miscClothes['closet'],
+            'basket': miscClothes['basket'],
+            'wash': miscClothes['wash'],
+            'total': miscClothes['total'],
+          },
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+
+      // Set autoincrement to the next available ID
+      await db.execute(
+          "UPDATE SQLITE_SEQUENCE SET SEQ=MAX(id) WHERE NAME='misc_clothes'");
+    } else {
+      // Insert default values
+      await db.insert('misc_clothes', {
+        'name': 'Top Innerwear',
+      });
+      await db.insert('misc_clothes', {
+        'name': 'Bottom Innerwear',
+      });
+      await db.insert('misc_clothes', {
+        'name': 'Socks',
+      });
     }
 
     // Delete the import directory
@@ -406,6 +507,20 @@ class DatabaseHelper {
     // Write JSON to file
     final exportFile = File(join(exportDir.path, "data.json"));
     await exportFile.writeAsString(jsonData);
+
+    // Query for all misc_clothes
+    final List<Map<String, dynamic>> miscClothes =
+        await db.query('misc_clothes');
+
+    // Convert to JSON
+    String jsonMiscClothes =
+        jsonEncode(miscClothes.map((e) => e).toList()).toString();
+
+    // Write JSON to file
+    final exportMiscClothesFile =
+        File(join(exportDir.path, "misc_clothes.json"));
+
+    await exportMiscClothesFile.writeAsString(jsonMiscClothes);
 
     // Declare the directory for images
     final imagesDir = Directory(join(appDir!.path));
@@ -481,6 +596,8 @@ class DatabaseHelper {
     await initDatabase();
     // Refresh all list controllers
     refreshAll();
+    // Refresh the category list
+    await refreshCategory();
   }
 
   // Generate a list of DbEntry from a list of maps

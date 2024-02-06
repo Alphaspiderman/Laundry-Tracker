@@ -27,6 +27,18 @@ class _HomePageState extends State<HomePage> {
     super.initState();
   }
 
+  @override
+  void didChangeDependencies() {
+    precacheImage(
+      Image.asset(
+        'assets/images/drawer_header.jpg',
+        cacheHeight: 400,
+      ).image,
+      context,
+    );
+    super.didChangeDependencies();
+  }
+
   void _hasData() {
     Get.snackbar(
       'Success',

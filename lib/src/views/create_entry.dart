@@ -8,6 +8,7 @@ import 'package:clothes_tracker/src/views/imgpicker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:path/path.dart';
+import 'package:image_cropper/image_cropper.dart';
 
 class DataCaptureScreen extends StatefulWidget {
   // Get a callback when data is saved
@@ -31,6 +32,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
   final DatabaseHelper dbHelper = Get.find();
   final TextEditingController _nameController = TextEditingController();
   int itemstate = 0;
+  File? origianlImage;
   String? imagePath;
   File? imageFile;
   int? categoryId;
@@ -50,6 +52,7 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
     setState(() {
       imagePath = imageName;
       imageFile = File(join(basePath, 'temp', imageName));
+      origianlImage = File(join(basePath, 'temp', imageName));
     });
   }
 
@@ -75,6 +78,39 @@ class _DataCaptureScreenState extends State<DataCaptureScreen> {
                 height: 200,
                 child: Image.file(imageFile!),
               ),
+            const SizedBox(height: 16.0),
+            if (imagePath != null)
+              ElevatedButton(
+                onPressed: () async {
+                  final croppedFile = await ImageCropper().cropImage(
+                    sourcePath: origianlImage!.path,
+                    compressQuality: 90,
+                    compressFormat: ImageCompressFormat.jpg,
+                    uiSettings: [
+                      AndroidUiSettings(
+                          toolbarTitle: 'Image Cropper',
+                          toolbarColor:
+                              Get.isDarkMode ? Colors.black : Colors.white,
+                          toolbarWidgetColor:
+                              Get.isDarkMode ? Colors.white : Colors.black,
+                          statusBarColor:
+                              Get.isDarkMode ? Colors.black : Colors.white,
+                          backgroundColor: Colors.black.withOpacity(0.5),
+                          initAspectRatio: CropAspectRatioPreset.square,
+                          lockAspectRatio: false),
+                    ],
+                  );
+                  if (croppedFile != null) {
+                    setState(
+                      () {
+                        imageFile = File(croppedFile.path);
+                      },
+                    );
+                  }
+                },
+                child: const Text('Crop Image'),
+              ),
+            const SizedBox(height: 16.0),
             // Dropdown to select the category
             DropdownButtonFormField(
               value: categoryId,

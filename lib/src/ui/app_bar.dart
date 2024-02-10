@@ -22,6 +22,7 @@ class CustomAppBar extends StatelessWidget {
           onPressed: () {
             Get.changeThemeMode(
                 Get.isDarkMode ? ThemeMode.light : ThemeMode.dark);
+            Get.toNamed(Get.currentRoute);
           },
           icon:
               Icon(Get.isDarkMode ? Icons.dark_mode : Icons.dark_mode_outlined),

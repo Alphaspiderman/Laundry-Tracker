@@ -32,8 +32,8 @@ class _NavBarState extends State<NavBar> {
     for (int i = 0; i < navBarItems.length; i++) {
       if (i == widget.itemIndex) {
         navBarItems[i] = ColorFiltered(
-          colorFilter: const ColorFilter.mode(
-            Colors.white,
+          colorFilter: ColorFilter.mode(
+            Colors.purple.shade300,
             BlendMode.srcIn,
           ),
           child: navBarItems[i],

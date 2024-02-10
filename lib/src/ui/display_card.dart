@@ -33,8 +33,9 @@ class DisplayCard extends StatelessWidget {
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               title: Text(data.name),
-              titleTextStyle: const TextStyle(
+              titleTextStyle: TextStyle(
                 fontSize: 26,
+                color: Theme.of(context).textTheme.displayMedium?.color,
               ),
               trailing: CardDropdown(entry: data),
             ),

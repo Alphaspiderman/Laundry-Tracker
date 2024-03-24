@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:clothes_tracker/src/models/category.dart';
+import 'package:clothes_tracker/src/models/db_exception.dart';
 import 'package:clothes_tracker/src/models/db_entry.dart';
 import 'package:clothes_tracker/src/models/state.dart';
 import 'package:clothes_tracker/src/utils/list_controller.dart';
@@ -62,7 +63,7 @@ class DatabaseHelper {
           // Create the table to hold infomration about the categories
           '''
           CREATE TABLE categories (
-            id INTEGER PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT
           )
           ''',
@@ -71,7 +72,7 @@ class DatabaseHelper {
         db.execute(
           '''
           CREATE TABLE clothes (
-            id INTEGER PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
             state INTEGER,
             image_path TEXT,
@@ -83,7 +84,7 @@ class DatabaseHelper {
         db.execute(
           '''
           CREATE TABLE misc_clothes (
-            id INTEGER PRIMARY KEY,
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
             closet INTEGER DEFAULT 0,
             basket INTEGER DEFAULT 0,
@@ -118,7 +119,7 @@ class DatabaseHelper {
           db.execute(
             '''
               CREATE TABLE misc_clothes (
-                id INTEGER PRIMARY KEY,
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT,
                 closet INTEGER DEFAULT 0,
                 basket INTEGER DEFAULT 0,
@@ -137,7 +138,7 @@ class DatabaseHelper {
           );
         }
       },
-      version: 2,
+      version: 3,
     );
     // Check if the default category exists
     if (!await checkCategory("Default")) {
@@ -231,8 +232,8 @@ class DatabaseHelper {
     );
   }
 
-  // Update Category
-  Future<void> updateCategory(int id, int categoryId) async {
+  // Update Category for an entry
+  Future<void> updateCategoryForItem(int id, int categoryId) async {
     Database db = await database;
     await db.update(
       'clothes',
@@ -314,10 +315,10 @@ class DatabaseHelper {
   }
 
   // Delete a category
-  Future<bool> deleteCategory(int id) async {
+  Future<void> deleteCategory(int id) async {
     // Make sure its not the default category
     if (id == 1) {
-      return false;
+      throw DbException("Default category cannot be deleted");
     }
     Database db = await database;
     // Delete the category
@@ -334,7 +335,6 @@ class DatabaseHelper {
       whereArgs: [id],
     );
     await refreshCategory();
-    return true;
   }
 
   // Import data
@@ -382,9 +382,13 @@ class DatabaseHelper {
         });
       }
 
-      // Set autoincrement to the next available ID
+      // Get the max value of id from the categories table
+      final List<Map<String, dynamic>> maxId =
+          await db.rawQuery('SELECT MAX(id) FROM categories');
+
+      // Set the sequence to the next available ID
       await db.execute(
-          "UPDATE SQLITE_SEQUENCE SET SEQ=MAX(id) WHERE NAME='categories'");
+          "UPDATE SQLITE_SEQUENCE SET SEQ=${maxId[0]['MAX(id)']} WHERE NAME='categories'");
 
       // Convert to List of DbEntry
       dataList = jsondata.map((e) => DbEntry.fromJson(e)).toList();
@@ -396,6 +400,9 @@ class DatabaseHelper {
       // Convert to List of DbEntry
       dataList = jsondata.map((e) => DbEntry.fromJson(e)).toList();
     }
+
+    // Refresh the category list
+    await refreshCategory();
 
     // Declare the directory for images
     final imagesDir = Directory(join(appDir!.path, "images"));
@@ -441,9 +448,13 @@ class DatabaseHelper {
         );
       }
 
+      // Get the max value of id from the misc_clothes table
+      final List<Map<String, dynamic>> maxId =
+          await db.rawQuery('SELECT MAX(id) FROM misc_clothes');
+
       // Set autoincrement to the next available ID
       await db.execute(
-          "UPDATE SQLITE_SEQUENCE SET SEQ=MAX(id) WHERE NAME='misc_clothes'");
+          "UPDATE SQLITE_SEQUENCE SET SEQ=${maxId[0]['MAX(id)']} WHERE NAME='misc_clothes'");
     } else {
       // Insert default values
       await db.insert('misc_clothes', {
@@ -459,11 +470,12 @@ class DatabaseHelper {
 
     // Delete the import directory
     await importDir.delete(recursive: true);
-
-    Get.back();
-    Get.snackbar("Import", "Data Imported!");
     // Refresh all list controllers
     refreshAll();
+
+    // Browse to the home page
+    Get.offAllNamed("/home");
+    Get.snackbar("Import", "Data Imported!");
   }
 
   // Export data as a ZIP
@@ -579,10 +591,6 @@ class DatabaseHelper {
 
   // Purge the database
   Future<void> purgeData() async {
-    Database db = await database;
-    // Delete all entries
-    await db.delete('clothes');
-    await db.delete('categories');
     // Delete the images directory
     final imagePath = join(appDir!.path, 'images');
     // Check if images directory exists
@@ -592,12 +600,18 @@ class DatabaseHelper {
     }
     // Recreate the images directory
     await Directory(imagePath).create();
+    // Delete the database
+    await _database!.close();
+    // Delete the database file
+    await deleteDatabase(join(await getDatabasesPath(), 'data.db'));
     // Recreate the database
     await initDatabase();
     // Refresh all list controllers
     refreshAll();
     // Refresh the category list
     await refreshCategory();
+    // Browse to the home page
+    Get.offAllNamed("/home");
   }
 
   // Generate a list of DbEntry from a list of maps
@@ -647,7 +661,7 @@ class DatabaseHelper {
     return stats;
   }
 
-  Future<void> updateName(int id, String value) async {
+  Future<void> updateNameOfItem(int id, String value) async {
     // Update the name for the entry
     Database db = await database;
 

@@ -53,7 +53,7 @@ class CardDropdown extends StatelessWidget {
             return;
           }
           // Update the name in the database
-          await dbHelper.updateName(entry.id, newName);
+          await dbHelper.updateNameOfItem(entry.id, newName);
           // Refresh the list
           dbHelper.refreshAll();
           // Close the dialog
@@ -145,7 +145,7 @@ class CardDropdown extends StatelessWidget {
             return;
           }
           // Update the category in the database
-          await dbHelper.updateCategory(entry.id, newCategory!);
+          await dbHelper.updateCategoryForItem(entry.id, newCategory!);
           // Refresh the list
           dbHelper.refreshAll();
           // Close the dialog

@@ -281,6 +281,37 @@ class DatabaseHelper {
     await refreshCategory();
   }
 
+  // Rename a category
+  Future<void> renameCategory(int id, String name) async {
+    // Prevent the default category from being renamed
+    if (id == 1) {
+      throw DbException("Default category cannot be renamed");
+    }
+    // Prevent the category from being renamed to Default
+    if (name == "Default") {
+      throw DbException("Category name cannot be Default");
+    }
+    // Prevent the category name from being empty
+    if (name.isEmpty) {
+      throw DbException("Category name cannot be empty");
+    }
+    // Prevent the category name from already existing
+    if (await checkCategory(name)) {
+      throw DbException("Category already exists");
+    }
+
+    // Get the database
+    Database db = await database;
+    // Update the category
+    await db.update(
+      'categories',
+      {'name': name},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    await refreshCategory();
+  }
+
   // Fetch all categories
   Future<List<Category>> fetchCategories() async {
     Database db = await database;

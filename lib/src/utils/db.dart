@@ -98,6 +98,7 @@ class DatabaseHelper {
       onUpgrade: (db, oldVersion, newVersion) {
         // Log the old and new versions
         log.i("Upgrading database from $oldVersion to $newVersion");
+        // Migration from version 1 to 2
         if (oldVersion < 2) {
           // Add the category_id column and set it to 0 for all entries (default category)
           db.execute(
@@ -137,6 +138,116 @@ class DatabaseHelper {
             },
           );
         }
+
+        // Migration from version 2 to 3
+        if (oldVersion < 3) {
+          // Create temp table for clothes
+          db.execute(
+            '''
+            CREATE TABLE clothes_temp (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              name TEXT,
+              state INTEGER,
+              image_path TEXT,
+              category_id INTEGER
+            )
+            ''',
+          );
+          // Copy data from clothes to clothes_temp
+          db.execute(
+            '''
+            INSERT INTO clothes_temp (id, name, state, image_path, category_id)
+            SELECT id, name, state, image_path, category_id
+            FROM clothes
+            ''',
+          );
+          // Drop the clothes table
+          db.execute(
+            '''
+            DROP TABLE clothes
+            ''',
+          );
+          // Rename the clothes_temp table to clothes
+          db.execute(
+            '''
+            ALTER TABLE clothes_temp
+            RENAME TO clothes
+            ''',
+          );
+
+          // Create temp table for misc_clothes
+          db.execute(
+            '''
+            CREATE TABLE misc_clothes_temp (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              name TEXT,
+              closet INTEGER DEFAULT 0,
+              basket INTEGER DEFAULT 0,
+              wash INTEGER DEFAULT 0,
+              total INTEGER DEFAULT 0,
+              CHECK (total = closet + basket + wash)
+            )
+            ''',
+          );
+
+          // Copy data from misc_clothes to misc_clothes_temp
+          db.execute(
+            '''
+            INSERT INTO misc_clothes_temp (id, name, closet, basket, wash, total)
+            SELECT id, name, closet, basket, wash, total
+            FROM misc_clothes
+            ''',
+          );
+
+          // Drop the misc_clothes table
+          db.execute(
+            '''
+            DROP TABLE misc_clothes
+            ''',
+          );
+
+          // Rename the misc_clothes_temp table to misc_clothes
+          db.execute(
+            '''
+            ALTER TABLE misc_clothes_temp
+            RENAME TO misc_clothes
+            ''',
+          );
+
+          // Create temp table for categories
+          db.execute(
+            '''
+            CREATE TABLE categories_temp (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              name TEXT
+            )
+            ''',
+          );
+
+          // Copy data from categories to categories_temp
+          db.execute(
+            '''
+            INSERT INTO categories_temp (id, name)
+            SELECT id, name
+            FROM categories
+            ''',
+          );
+
+          // Drop the categories table
+          db.execute(
+            '''
+            DROP TABLE categories
+            ''',
+          );
+
+          // Rename the categories_temp table to categories
+          db.execute(
+            '''
+            ALTER TABLE categories_temp
+            RENAME TO categories
+            ''',
+          );
+        }
       },
       version: 3,
     );
@@ -159,7 +270,32 @@ class DatabaseHelper {
       await _database!.insert('misc_clothes', {
         'name': 'Socks',
       });
+    } else {
+      // Get the max value of id from the misc_clothes table
+      final List<Map<String, dynamic>> maxId =
+          await _database!.rawQuery('SELECT MAX(id) FROM misc_clothes');
+
+      // Set autoincrement to the next available ID
+      await _database!.execute(
+          "UPDATE SQLITE_SEQUENCE SET SEQ=${maxId[0]['MAX(id)']} WHERE NAME='misc_clothes'");
     }
+
+    // Get the max value of id from the categories table
+    final List<Map<String, dynamic>> maxIdCategories =
+        await _database!.rawQuery('SELECT MAX(id) FROM categories');
+
+    // Set autoincrement to the next available ID
+    await _database!.execute(
+        "UPDATE SQLITE_SEQUENCE SET SEQ=${maxIdCategories[0]['MAX(id)']} WHERE NAME='categories'");
+
+    // Get the max value of id from the clothes table
+    final List<Map<String, dynamic>> maxIdClothes =
+        await _database!.rawQuery('SELECT MAX(id) FROM clothes');
+
+    // Set autoincrement to the next available ID
+    await _database!.execute(
+        "UPDATE SQLITE_SEQUENCE SET SEQ=${maxIdClothes[0]['MAX(id)']} WHERE NAME='clothes'");
+
     log.i("Database initialized");
   }
 
@@ -379,130 +515,44 @@ class DatabaseHelper {
       destinationDir: Directory(join(appDir!.path, "import")),
     );
 
+    // Check if the ZIP file contains a version file
+    final versionFile = File(join(appDir!.path, "import", "version.txt"));
+
+    int importVersion = 0;
+
+    if (!versionFile.existsSync()) {
+      // Version file not found, import from version 1
+      importVersion = 1;
+    } else {
+      // Read the version file
+      final version = await versionFile.readAsString();
+      importVersion = int.parse(version);
+    }
+
+    // Import data based on the version
+    switch (importVersion) {
+      case 1:
+        await importFromVersion1();
+        break;
+      case 2:
+        await importFromVersion2();
+        break;
+      case 3:
+        await importFromVersion3();
+        break;
+      default:
+        throw DbException("Invalid version number");
+    }
+
     // Declare the directory for the imported data
     final importDir = Directory(join(appDir!.path, "import"));
-    final importCategoriesFile = File(join(importDir.path, "categories.json"));
-    final importDataFile = File(join(importDir.path, "data.json"));
-    final importMiscClothesFile =
-        File(join(importDir.path, "misc_clothes.json"));
-
-    // Read JSON file and get a list of maps
-    final clothesData = await importDataFile.readAsString();
-    List jsondata = json.decode(clothesData);
-
-    // Get database
-    Database db = await database;
-
-    // Declare the list of DbEntry
-    List<DbEntry> dataList = [];
-
-    // Check if the categories file exists
-    if (importCategoriesFile.existsSync()) {
-      // Read JSON file and get a list of maps
-      final categoriesData = await importCategoriesFile.readAsString();
-      List jsonCategories = json.decode(categoriesData);
-      // Save the categories to the database
-      for (var category in jsonCategories) {
-        // Prevent the default category from being imported
-        if (category['id'] == 1) {
-          continue;
-        }
-        await db.insert('categories', {
-          'id': category['id'],
-          'name': category['name'],
-        });
-      }
-
-      // Get the max value of id from the categories table
-      final List<Map<String, dynamic>> maxId =
-          await db.rawQuery('SELECT MAX(id) FROM categories');
-
-      // Set the sequence to the next available ID
-      await db.execute(
-          "UPDATE SQLITE_SEQUENCE SET SEQ=${maxId[0]['MAX(id)']} WHERE NAME='categories'");
-
-      // Convert to List of DbEntry
-      dataList = jsondata.map((e) => DbEntry.fromJson(e)).toList();
-    } else {
-      // Set the category_id to 1 for all entries
-      for (var data in jsondata) {
-        data['categoryId'] = 1;
-      }
-      // Convert to List of DbEntry
-      dataList = jsondata.map((e) => DbEntry.fromJson(e)).toList();
-    }
-
-    // Refresh the category list
-    await refreshCategory();
-
-    // Declare the directory for images
-    final imagesDir = Directory(join(appDir!.path, "images"));
-    final importImagesDir = Directory(importDir.path);
-
-    // Create directory if it doesn't exist
-    if (!imagesDir.existsSync()) {
-      await imagesDir.create(recursive: true);
-    }
-
-    // Insert data into the database and copy image
-    for (DbEntry data in dataList) {
-      await db.insert('clothes', {
-        'name': data.name,
-        'state': data.state.index,
-        'image_path': data.imagePath,
-        'category_id': data.categoryId,
-      });
-
-      final importImagePath = importImagesDir.path + data.imagePath;
-      final saveImagePath = appDir!.path + data.imagePath;
-      await File(importImagePath).copy(saveImagePath);
-    }
-
-    // Check if the misc_clothes export file exists
-    if (importMiscClothesFile.existsSync()) {
-      // Read JSON file and get a list of maps
-      final miscClothesData = await importMiscClothesFile.readAsString();
-      List jsonMiscClothes = json.decode(miscClothesData);
-      // Save the categories to the database
-      for (var miscClothes in jsonMiscClothes) {
-        await db.insert(
-          'misc_clothes',
-          {
-            'id': miscClothes['id'],
-            'name': miscClothes['name'],
-            'closet': miscClothes['closet'],
-            'basket': miscClothes['basket'],
-            'wash': miscClothes['wash'],
-            'total': miscClothes['total'],
-          },
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
-      }
-
-      // Get the max value of id from the misc_clothes table
-      final List<Map<String, dynamic>> maxId =
-          await db.rawQuery('SELECT MAX(id) FROM misc_clothes');
-
-      // Set autoincrement to the next available ID
-      await db.execute(
-          "UPDATE SQLITE_SEQUENCE SET SEQ=${maxId[0]['MAX(id)']} WHERE NAME='misc_clothes'");
-    } else {
-      // Insert default values
-      await db.insert('misc_clothes', {
-        'name': 'Top Innerwear',
-      });
-      await db.insert('misc_clothes', {
-        'name': 'Bottom Innerwear',
-      });
-      await db.insert('misc_clothes', {
-        'name': 'Socks',
-      });
-    }
 
     // Delete the import directory
     await importDir.delete(recursive: true);
     // Refresh all list controllers
     refreshAll();
+    // Refresh the category list
+    await refreshCategory();
 
     // Browse to the home page
     Get.offAllNamed("/home");
@@ -702,5 +752,189 @@ class DatabaseHelper {
       where: 'id = ?',
       whereArgs: [id],
     );
+  }
+
+  Future<void> importFromVersion1() async {
+    // Import data from version 1 of the app
+    // Declare the directory for the imported data
+    final importDir = Directory(join(appDir!.path, "import"));
+    final importDataFile = File(join(importDir.path, "data.json"));
+
+    // Read JSON file and get a list of maps
+    final clothesData = await importDataFile.readAsString();
+    List jsondata = json.decode(clothesData);
+
+    // Get database
+    Database db = await database;
+
+    // Declare the list of DbEntry
+    List<DbEntry> dataList = [];
+
+    // Categories do not exist in version 1
+    // Set the category_id to 1 for all entries
+    for (var data in jsondata) {
+      data['categoryId'] = 1;
+    }
+    // Convert to List of DbEntry
+    dataList = jsondata.map((e) => DbEntry.fromJson(e)).toList();
+
+    // Refresh the category list
+    await refreshCategory();
+
+    // Declare the directory for images
+    final imagesDir = Directory(join(appDir!.path, "images"));
+    final importImagesDir = Directory(importDir.path);
+
+    // Create directory if it doesn't exist
+    if (!imagesDir.existsSync()) {
+      await imagesDir.create(recursive: true);
+    }
+
+    // Insert data into the database and copy image
+    for (DbEntry data in dataList) {
+      await db.insert('clothes', {
+        'name': data.name,
+        'state': data.state.index,
+        'image_path': data.imagePath,
+        'category_id': data.categoryId,
+      });
+
+      final importImagePath = importImagesDir.path + data.imagePath;
+      final saveImagePath = appDir!.path + data.imagePath;
+      await File(importImagePath).copy(saveImagePath);
+    }
+
+    // Misc_clothes do not exist in version 1
+    // Insert default values
+    await db.insert('misc_clothes', {
+      'name': 'Top Innerwear',
+    });
+    await db.insert('misc_clothes', {
+      'name': 'Bottom Innerwear',
+    });
+    await db.insert('misc_clothes', {
+      'name': 'Socks',
+    });
+  }
+
+  Future<void> importFromVersion2() async {
+    // Import data from version 2 of the app
+    // Declare the directory for the imported data
+    final importDir = Directory(join(appDir!.path, "import"));
+    final importCategoriesFile = File(join(importDir.path, "categories.json"));
+    final importDataFile = File(join(importDir.path, "data.json"));
+    final importMiscClothesFile =
+        File(join(importDir.path, "misc_clothes.json"));
+
+    // Read JSON file and get a list of maps
+    final clothesData = await importDataFile.readAsString();
+    List jsondata = json.decode(clothesData);
+
+    // Get database
+    Database db = await database;
+
+    // Declare the list of DbEntry
+    List<DbEntry> dataList = [];
+
+    // Read JSON file and get a list of maps
+    final categoriesData = await importCategoriesFile.readAsString();
+    List jsonCategories = json.decode(categoriesData);
+    // Save the categories to the database
+    for (var category in jsonCategories) {
+      // Prevent the default category from being imported
+      if (category['id'] == 1) {
+        continue;
+      }
+      await db.insert('categories', {
+        'id': category['id'],
+        'name': category['name'],
+      });
+    }
+
+    // Get the max value of id from the categories table
+    final List<Map<String, dynamic>> maxId =
+        await db.rawQuery('SELECT MAX(id) FROM categories');
+
+    // Set the sequence to the next available ID
+    await db.execute(
+        "UPDATE SQLITE_SEQUENCE SET SEQ=${maxId[0]['MAX(id)']} WHERE NAME='categories'");
+
+    // Convert to List of DbEntry
+    dataList = jsondata.map((e) => DbEntry.fromJson(e)).toList();
+
+    // Refresh the category list
+    await refreshCategory();
+
+    // Declare the directory for images
+    final imagesDir = Directory(join(appDir!.path, "images"));
+    final importImagesDir = Directory(importDir.path);
+
+    // Create directory if it doesn't exist
+    if (!imagesDir.existsSync()) {
+      await imagesDir.create(recursive: true);
+    }
+
+    // Insert data into the database and copy image
+    for (DbEntry data in dataList) {
+      await db.insert('clothes', {
+        'name': data.name,
+        'state': data.state.index,
+        'image_path': data.imagePath,
+        'category_id': data.categoryId,
+      });
+
+      final importImagePath = importImagesDir.path + data.imagePath;
+      final saveImagePath = appDir!.path + data.imagePath;
+      await File(importImagePath).copy(saveImagePath);
+    }
+
+    // Check if the misc_clothes export file exists
+    if (importMiscClothesFile.existsSync()) {
+      // Read JSON file and get a list of maps
+      final miscClothesData = await importMiscClothesFile.readAsString();
+      List jsonMiscClothes = json.decode(miscClothesData);
+      // Save the categories to the database
+      for (var miscClothes in jsonMiscClothes) {
+        await db.insert(
+          'misc_clothes',
+          {
+            'id': miscClothes['id'],
+            'name': miscClothes['name'],
+            'closet': miscClothes['closet'],
+            'basket': miscClothes['basket'],
+            'wash': miscClothes['wash'],
+            'total': miscClothes['total'],
+          },
+          conflictAlgorithm: ConflictAlgorithm.replace,
+        );
+      }
+
+      // Get the max value of id from the misc_clothes table
+      final List<Map<String, dynamic>> maxId =
+          await db.rawQuery('SELECT MAX(id) FROM misc_clothes');
+
+      // Set autoincrement to the next available ID
+      await db.execute(
+          "UPDATE SQLITE_SEQUENCE SET SEQ=${maxId[0]['MAX(id)']} WHERE NAME='misc_clothes'");
+    } else {
+      // Insert default values
+      await db.insert('misc_clothes', {
+        'name': 'Top Innerwear',
+      });
+      await db.insert('misc_clothes', {
+        'name': 'Bottom Innerwear',
+      });
+      await db.insert('misc_clothes', {
+        'name': 'Socks',
+      });
+    }
+  }
+
+  Future<void> importFromVersion3() async {
+    // Import data from version 3 of the app
+
+    // There was no change in the data structure from version 2 to version 3
+    // So the import process is the same as version 2
+    await importFromVersion2();
   }
 }

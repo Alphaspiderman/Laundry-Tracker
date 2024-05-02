@@ -839,12 +839,14 @@ class DatabaseHelper {
     // Read JSON file and get a list of maps
     final categoriesData = await importCategoriesFile.readAsString();
     List jsonCategories = json.decode(categoriesData);
+
     // Save the categories to the database
     for (var category in jsonCategories) {
       // Prevent the default category from being imported
       if (category['id'] == 1) {
         continue;
       }
+
       await db.insert('categories', {
         'id': category['id'],
         'name': category['name'],
@@ -888,46 +890,33 @@ class DatabaseHelper {
       await File(importImagePath).copy(saveImagePath);
     }
 
-    // Check if the misc_clothes export file exists
-    if (importMiscClothesFile.existsSync()) {
-      // Read JSON file and get a list of maps
-      final miscClothesData = await importMiscClothesFile.readAsString();
-      List jsonMiscClothes = json.decode(miscClothesData);
-      // Save the categories to the database
-      for (var miscClothes in jsonMiscClothes) {
-        await db.insert(
-          'misc_clothes',
-          {
-            'id': miscClothes['id'],
-            'name': miscClothes['name'],
-            'closet': miscClothes['closet'],
-            'basket': miscClothes['basket'],
-            'wash': miscClothes['wash'],
-            'total': miscClothes['total'],
-          },
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
-      }
-
-      // Get the max value of id from the misc_clothes table
-      final List<Map<String, dynamic>> maxId =
-          await db.rawQuery('SELECT MAX(id) FROM misc_clothes');
-
-      // Set autoincrement to the next available ID
-      await db.execute(
-          "UPDATE SQLITE_SEQUENCE SET SEQ=${maxId[0]['MAX(id)']} WHERE NAME='misc_clothes'");
-    } else {
-      // Insert default values
-      await db.insert('misc_clothes', {
-        'name': 'Top Innerwear',
-      });
-      await db.insert('misc_clothes', {
-        'name': 'Bottom Innerwear',
-      });
-      await db.insert('misc_clothes', {
-        'name': 'Socks',
-      });
+    // Misc_clothes exists in version 2
+    // Read JSON file and get a list of maps
+    final miscClothesData = await importMiscClothesFile.readAsString();
+    List jsonMiscClothes = json.decode(miscClothesData);
+    // Save the items to the database
+    for (var miscClothes in jsonMiscClothes) {
+      await db.insert(
+        'misc_clothes',
+        {
+          'id': miscClothes['id'],
+          'name': miscClothes['name'],
+          'closet': miscClothes['closet'],
+          'basket': miscClothes['basket'],
+          'wash': miscClothes['wash'],
+          'total': miscClothes['total'],
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
     }
+
+    // Get the max value of id from the misc_clothes table
+    final List<Map<String, dynamic>> maxIdMisc =
+        await db.rawQuery('SELECT MAX(id) FROM misc_clothes');
+
+    // Set autoincrement to the next available ID
+    await db.execute(
+        "UPDATE SQLITE_SEQUENCE SET SEQ=${maxIdMisc[0]['MAX(id)']} WHERE NAME='misc_clothes'");
   }
 
   Future<void> importFromVersion3() async {

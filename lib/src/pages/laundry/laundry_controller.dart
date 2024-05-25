@@ -11,6 +11,7 @@ class LaundryController extends GetxController {
   final DatabaseHelper dbHelper = Get.find();
   final ListController listController = Get.find(tag: "laundry");
   final List<Category> categories = Get.find();
+  Map<int, Category> categoryMap = Get.find();
 
   // Function to remove an item from the list by its ID
   void removeItem(int id) {
@@ -81,13 +82,35 @@ class LaundryController extends GetxController {
             ),
           );
         }
+
+        // Make an empty list of categories
+        Map<Category, List<DbEntry>> localData = {};
+
+        // Only add categories that have items in the list
+        for (DbEntry entry in listController.items) {
+          Category category = categoryMap[entry.categoryId]!;
+          if (localData.containsKey(category)) {
+            if (localData[category] != null) {
+              localData[category]!.add(entry);
+            } else {
+              localData[category] = [entry];
+            }
+          } else {
+            localData[category] = [entry];
+          }
+        }
+
+        // Sort the categories by their id
+        List<Category> sortedCategories = localData.keys.toList();
+        sortedCategories.sort((a, b) => a.id.compareTo(b.id));
+
         // Return a list of expansion tiles for each categories with cards inside
         return ListView.builder(
-          itemCount: categories.length,
+          itemCount: sortedCategories.length,
           itemBuilder: (context, idx) {
-            Category category = categories[idx];
+            Category category = sortedCategories[idx];
             return ExpansionTile(
-              initiallyExpanded: true,
+              initiallyExpanded: false,
               title: Text(
                 category.name,
                 style: const TextStyle(
@@ -99,9 +122,9 @@ class LaundryController extends GetxController {
                 ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: listController.items.length,
+                  itemCount: localData[category]!.length,
                   itemBuilder: (context, index) {
-                    DbEntry item = listController.items[index];
+                    DbEntry item = localData[category]![index];
                     if (item.categoryId == category.id) {
                       return Dismissible(
                         key: Key(item.id.toString()),

@@ -6,13 +6,12 @@ import 'package:clothes_tracker/src/utils/db.dart';
 import 'package:clothes_tracker/src/utils/list_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:logger/logger.dart';
 
 class BasketController extends GetxController {
   final DatabaseHelper dbHelper = Get.find();
   final ListController listController = Get.find(tag: "basket");
   final List<Category> categories = Get.find();
-  final Logger logger = Get.find();
+  Map<int, Category> categoryMap = Get.find();
 
   // Function to remove an item from the list by its ID
   void removeItem(int id) {
@@ -79,13 +78,35 @@ class BasketController extends GetxController {
             ),
           );
         }
+
+        // Make an empty list of categories
+        Map<Category, List<DbEntry>> localData = {};
+
+        // Only add categories that have items in the list
+        for (DbEntry entry in listController.items) {
+          Category category = categoryMap[entry.categoryId]!;
+          if (localData.containsKey(category)) {
+            if (localData[category] != null) {
+              localData[category]!.add(entry);
+            } else {
+              localData[category] = [entry];
+            }
+          } else {
+            localData[category] = [entry];
+          }
+        }
+
+        // Sort the categories by their id
+        List<Category> sortedCategories = localData.keys.toList();
+        sortedCategories.sort((a, b) => a.id.compareTo(b.id));
+
         // Return a list of expansion tiles for each categories with cards inside
         return ListView.builder(
-          itemCount: categories.length,
+          itemCount: sortedCategories.length,
           itemBuilder: (context, idx) {
-            Category category = categories[idx];
+            Category category = sortedCategories[idx];
             return ExpansionTile(
-              initiallyExpanded: true,
+              initiallyExpanded: false,
               title: Text(
                 category.name,
                 style: const TextStyle(
@@ -97,9 +118,9 @@ class BasketController extends GetxController {
                 ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: listController.items.length,
+                  itemCount: localData[category]!.length,
                   itemBuilder: (context, index) {
-                    DbEntry item = listController.items[index];
+                    DbEntry item = localData[category]![index];
                     if (item.categoryId == category.id) {
                       return Dismissible(
                         key: Key(item.id.toString()),
@@ -140,9 +161,8 @@ class BasketController extends GetxController {
                         ),
                         child: DisplayCard(data: item),
                       );
-                    } else {
-                      return const SizedBox();
                     }
+                    return null;
                   },
                 ),
               ],

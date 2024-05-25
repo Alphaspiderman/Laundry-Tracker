@@ -43,16 +43,46 @@ class DatabaseHelper {
     Get.find<ListController>(tag: "laundry").refreshData(States.laundry);
   }
 
+  Future<Map<int, Category>> fetchCategoryMap() async {
+    // Get the list of categories
+    List<Category> categories = Get.find();
+    // Create a map of Category ID to Category
+    Map<int, Category> categoryMap = {};
+    for (var category in categories) {
+      categoryMap[category.id] = category;
+    }
+    return categoryMap;
+  }
+
   Future<void> refreshCategory() async {
     // Check if the category list is in GetX
-    if (!Get.isRegistered<List<Category>>()) {
-      return;
+    List<Category> categories;
+
+    if (Get.isRegistered<List<Category>>()) {
+      categories = Get.find();
+    } else {
+      categories = [];
+      Get.put(categories);
     }
-    List<Category> categories = Get.find();
     // Load categories from database
     List<Category> dbCategories = await fetchCategories();
     // Replace the old list with the new list
     categories.assignAll(dbCategories);
+
+    // Check if the category map is in GetX
+    Map<int, Category> categoryMap;
+
+    if (Get.isRegistered<Map<int, Category>>()) {
+      categoryMap = Get.find();
+    } else {
+      categoryMap = {};
+      Get.put(categoryMap);
+    }
+
+    // Load the category map from the database
+    Map<int, Category> dbCategoryMap = await fetchCategoryMap();
+    // Replace the old map with the new map
+    categoryMap.addAll(dbCategoryMap);
   }
 
   Future<void> initDatabase() async {
@@ -366,6 +396,7 @@ class DatabaseHelper {
       where: 'id = ?',
       whereArgs: [id],
     );
+    refreshAll();
   }
 
   // Update Category for an entry

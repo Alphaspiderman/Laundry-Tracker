@@ -69,6 +69,7 @@ void main() async {
 
   // Categories list from database
   Get.put(await db.fetchCategories(), permanent: true);
+  Get.put(await db.fetchCategoryMap(), permanent: true);
 
   // Refresh all lists using the database
   db.refreshAll();

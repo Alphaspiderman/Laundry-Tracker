@@ -1,5 +1,8 @@
 import 'dart:io';
 
+import 'package:clothes_tracker/src/pages/basket/basket_controller.dart';
+import 'package:clothes_tracker/src/pages/closet/closet_controller.dart';
+import 'package:clothes_tracker/src/pages/laundry/laundry_controller.dart';
 import 'package:clothes_tracker/src/utils/db.dart';
 import 'package:clothes_tracker/src/utils/list_controller.dart';
 import 'package:flutter/material.dart';
@@ -65,12 +68,17 @@ void main() async {
   Get.put(ListController(), tag: "basket");
   Get.put(ListController(), tag: "laundry");
 
-  runApp(const LaundryApp());
-
   // Categories list from database
   Get.put(await db.fetchCategories(), permanent: true);
   Get.put(await db.fetchCategoryMap(), permanent: true);
 
   // Refresh all lists using the database
   db.refreshAll();
+
+  // Initialise the controllers
+  Get.put(BasketController());
+  Get.put(ClosetController());
+  Get.put(LaundryController());
+
+  runApp(const LaundryApp());
 }

@@ -6,33 +6,8 @@ import 'package:clothes_tracker/src/views/create_entry.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class LaundryPage extends StatefulWidget {
+class LaundryPage extends GetWidget<LaundryController> {
   const LaundryPage({super.key});
-
-  @override
-  // ignore: library_private_types_in_public_api
-  _LaundryPageState createState() => _LaundryPageState();
-}
-
-class _LaundryPageState extends State<LaundryPage> {
-  final LaundryController laundryController = LaundryController();
-
-  @override
-  void initState() {
-    super.initState();
-    laundryController.addListener(() {
-      setState(() {});
-    });
-  }
-
-  void _hasData() {
-    Get.snackbar(
-      'Success',
-      'Data saved successfully',
-      duration: const Duration(seconds: 1),
-    );
-    setState(() {});
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,14 +22,14 @@ class _LaundryPageState extends State<LaundryPage> {
             ),
           ];
         },
-        body: laundryController.getBody(),
+        body: controller.getBody(),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
         shape: const CircleBorder(),
         child: const Icon(Icons.add),
         onPressed: () async {
-          Get.to(() => DataCaptureScreen(hasData: _hasData));
+          Get.to(() => DataCaptureScreen(hasData: controller.hasData));
         },
       ),
       bottomNavigationBar: const NavBar(itemIndex: 4),

@@ -33,6 +33,7 @@ class ClosetController extends GetxController {
       'Data saved successfully',
       duration: const Duration(seconds: 1),
     );
+    update();
   }
 
   void moveToBasket(int id) async {

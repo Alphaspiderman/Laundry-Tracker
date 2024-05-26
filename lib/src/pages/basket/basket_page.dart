@@ -6,24 +6,8 @@ import 'package:clothes_tracker/src/views/create_entry.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class BasketPage extends StatefulWidget {
+class BasketPage extends GetWidget<BasketController> {
   const BasketPage({super.key});
-
-  @override
-  // ignore: library_private_types_in_public_api
-  _BasketPageState createState() => _BasketPageState();
-}
-
-class _BasketPageState extends State<BasketPage> {
-  final BasketController basketController = BasketController();
-
-  @override
-  void initState() {
-    super.initState();
-    basketController.addListener(() {
-      setState(() {});
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,14 +22,14 @@ class _BasketPageState extends State<BasketPage> {
             ),
           ];
         },
-        body: basketController.getBody(),
+        body: controller.getBody(),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
         shape: const CircleBorder(),
         child: const Icon(Icons.add),
         onPressed: () async {
-          Get.to(() => DataCaptureScreen(hasData: basketController.hasData));
+          Get.to(() => DataCaptureScreen(hasData: controller.hasData));
         },
       ),
       bottomNavigationBar: const NavBar(itemIndex: 3),

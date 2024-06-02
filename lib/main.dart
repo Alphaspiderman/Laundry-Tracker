@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:clothes_tracker/src/pages/basket/basket_controller.dart';
 import 'package:clothes_tracker/src/pages/closet/closet_controller.dart';
-import 'package:clothes_tracker/src/pages/laundry/laundry_controller.dart';
+import 'package:clothes_tracker/src/utils/app_page_controller.dart';
 import 'package:clothes_tracker/src/utils/db.dart';
 import 'package:clothes_tracker/src/utils/list_controller.dart';
 import 'package:flutter/material.dart';
@@ -78,7 +78,8 @@ void main() async {
   // Initialise the controllers
   Get.put(BasketController());
   Get.put(ClosetController());
-  Get.put(LaundryController());
+  // Get.put(LaundryController());
+  Get.put(AppPageController());
 
   runApp(const LaundryApp());
 }

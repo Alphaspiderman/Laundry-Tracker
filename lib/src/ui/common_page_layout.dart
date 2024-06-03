@@ -1,10 +1,11 @@
 import 'package:clothes_tracker/src/models/category.dart';
 import 'package:clothes_tracker/src/models/db_entry.dart';
+import 'package:clothes_tracker/src/models/state.dart';
 import 'package:clothes_tracker/src/ui/display_card.dart';
 import 'package:clothes_tracker/src/utils/app_page_controller.dart';
 import 'package:flutter/material.dart';
 
-class CommonPageLayout extends StatelessWidget {
+class CommonPageLayout extends StatefulWidget {
   final List<DbEntry> data;
   final Map<int, Category> categoryMap;
   final AppPageController controller;
@@ -16,13 +17,22 @@ class CommonPageLayout extends StatelessWidget {
       required this.categoryMap});
 
   @override
+  State<CommonPageLayout> createState() => _CommonPageLayoutState();
+}
+
+class _CommonPageLayoutState extends State<CommonPageLayout> {
+  late Function swipeEndToStart;
+
+  late Function swipeStartToEnd;
+
+  @override
   Widget build(BuildContext context) {
     // Make an empty list of categories
     Map<Category, List<DbEntry>> localData = {};
 
     // Only add categories that have items in the list
-    for (DbEntry entry in data) {
-      Category category = categoryMap[entry.categoryId]!;
+    for (DbEntry entry in widget.data) {
+      Category category = widget.categoryMap[entry.categoryId]!;
       if (localData.containsKey(category)) {
         if (localData[category] != null) {
           localData[category]!.add(entry);
@@ -32,6 +42,25 @@ class CommonPageLayout extends StatelessWidget {
       } else {
         localData[category] = [entry];
       }
+    }
+
+    // refer to the swipe actions based on current state of clothes
+    States currentState = widget.data[0].state;
+
+    // Based on the current state of clothes, show the appropriate swipe actions
+    switch (currentState) {
+      case States.basket:
+        swipeEndToStart = widget.controller.moveToCloset;
+        swipeStartToEnd = widget.controller.moveToLaundry;
+        break;
+      case States.closet:
+        swipeEndToStart = widget.controller.moveToLaundry;
+        swipeStartToEnd = widget.controller.moveToBasket;
+        break;
+      case States.laundry:
+        swipeEndToStart = widget.controller.moveToBasket;
+        swipeStartToEnd = widget.controller.moveToCloset;
+        break;
     }
 
     // Sort the categories by their id
@@ -48,9 +77,9 @@ class CommonPageLayout extends StatelessWidget {
             key: Key(entry.id.toString()),
             onDismissed: (DismissDirection direction) {
               if (direction == DismissDirection.endToStart) {
-                controller.moveToBasket(entry.id);
+                swipeEndToStart(entry.id);
               } else {
-                controller.moveToCloset(entry.id);
+                swipeStartToEnd(entry.id);
               }
             },
             background: Container(

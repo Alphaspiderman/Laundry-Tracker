@@ -22,7 +22,6 @@ class CommonPageLayout extends StatefulWidget {
 
 class _CommonPageLayoutState extends State<CommonPageLayout> {
   late Function swipeEndToStart;
-
   late Function swipeStartToEnd;
 
   @override
@@ -121,7 +120,8 @@ class _CommonPageLayoutState extends State<CommonPageLayout> {
       itemBuilder: (context, idx) {
         Category category = sortedCategories[idx];
         return ExpansionTile(
-          initiallyExpanded: false,
+          key: const PageStorageKey("scrollable"),
+          initiallyExpanded: true,
           title: Text(
             category.name,
             style: const TextStyle(

@@ -61,6 +61,8 @@ class AppPageController extends GetxController {
       id,
       States.laundry,
     );
+    // Rebuild
+    update();
     // Show a notification
     Get.snackbar(
       'Success',

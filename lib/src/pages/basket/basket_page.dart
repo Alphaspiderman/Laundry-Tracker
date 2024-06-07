@@ -17,6 +17,7 @@ class BasketPage extends GetWidget<AppPageController> {
     return Scaffold(
       drawer: const AppDrawer(),
       body: NestedScrollView(
+        key: const PageStorageKey(States.basket),
         floatHeaderSlivers: true,
         headerSliverBuilder: (BuildContext context, bool isScrolled) {
           return [
@@ -42,7 +43,7 @@ class BasketPage extends GetWidget<AppPageController> {
                       child: Text(
                         "Basket is Empty",
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 30,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

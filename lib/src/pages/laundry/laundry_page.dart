@@ -19,6 +19,7 @@ class LaundryPage extends GetView<AppPageController> {
     return Scaffold(
       drawer: const AppDrawer(),
       body: NestedScrollView(
+        key: const PageStorageKey(States.laundry),
         floatHeaderSlivers: true,
         headerSliverBuilder: (BuildContext context, bool isScrolled) {
           return [
@@ -44,7 +45,7 @@ class LaundryPage extends GetView<AppPageController> {
                       child: Text(
                         "Laundry is Empty",
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 30,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

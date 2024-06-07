@@ -17,6 +17,7 @@ class ClosetPage extends GetWidget<AppPageController> {
     return Scaffold(
       drawer: const AppDrawer(),
       body: NestedScrollView(
+        key: const PageStorageKey(States.closet),
         floatHeaderSlivers: true,
         headerSliverBuilder: (BuildContext context, bool isScrolled) {
           return [
@@ -42,7 +43,7 @@ class ClosetPage extends GetWidget<AppPageController> {
                       child: Text(
                         "Closet is Empty",
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 30,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

@@ -9,12 +9,14 @@ class CommonPageLayout extends StatefulWidget {
   final List<DbEntry> data;
   final Map<int, Category> categoryMap;
   final AppPageController controller;
+  final ScrollController scrollController;
 
   const CommonPageLayout(
       {super.key,
       required this.data,
       required this.controller,
-      required this.categoryMap});
+      required this.categoryMap,
+      required this.scrollController});
 
   @override
   State<CommonPageLayout> createState() => _CommonPageLayoutState();
@@ -116,6 +118,7 @@ class _CommonPageLayoutState extends State<CommonPageLayout> {
 
     // Return a ListView of the categories
     return ListView.builder(
+      controller: widget.scrollController,
       itemCount: sortedCategories.length,
       itemBuilder: (context, idx) {
         Category category = sortedCategories[idx];

@@ -14,6 +14,8 @@ class BasketPage extends GetWidget<AppPageController> {
 
   @override
   Widget build(BuildContext context) {
+    final ScrollController scrollController = ScrollController();
+
     return Scaffold(
       drawer: const AppDrawer(),
       body: NestedScrollView(
@@ -54,6 +56,7 @@ class BasketPage extends GetWidget<AppPageController> {
                     categoryMap: controller.categoryMap,
                     controller: controller,
                     data: data,
+                    scrollController: scrollController,
                   );
                 }
               },

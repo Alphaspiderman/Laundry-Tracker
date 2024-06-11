@@ -123,7 +123,7 @@ class _CommonPageLayoutState extends State<CommonPageLayout> {
       itemBuilder: (context, idx) {
         Category category = sortedCategories[idx];
         return ExpansionTile(
-          key: const PageStorageKey("scrollable"),
+          key: PageStorageKey(category.id),
           initiallyExpanded: true,
           title: Text(
             category.name,

@@ -2,6 +2,7 @@ import 'package:clothes_tracker/src/models/category.dart';
 import 'package:clothes_tracker/src/models/db_entry.dart';
 import 'package:clothes_tracker/src/models/state.dart';
 import 'package:clothes_tracker/src/utils/db.dart';
+import 'package:clothes_tracker/src/utils/snackbar_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -14,10 +15,12 @@ class AppPageController extends GetxController {
   }
 
   void hasData() {
-    Get.snackbar(
-      'Success',
-      'Data saved successfully',
-      duration: const Duration(seconds: 1),
+    SnackbarManager().showSnackbar(
+      const GetSnackBar(
+        title: 'Success',
+        message: 'Data saved successfully',
+        duration: Duration(seconds: 2),
+      ),
     );
     // Rebuild
     update();
@@ -32,10 +35,12 @@ class AppPageController extends GetxController {
     // Rebuild
     update();
     // Show a notification
-    Get.snackbar(
-      'Success',
-      'Item moved to Basket',
-      duration: const Duration(seconds: 1),
+    SnackbarManager().showSnackbar(
+      const GetSnackBar(
+        title: 'Success',
+        message: 'Item moved to Basket',
+        duration: Duration(seconds: 2),
+      ),
     );
   }
 
@@ -48,10 +53,12 @@ class AppPageController extends GetxController {
     // Rebuild
     update();
     // Show a notification
-    Get.snackbar(
-      'Success',
-      'Item moved to Closet',
-      duration: const Duration(seconds: 1),
+    SnackbarManager().showSnackbar(
+      const GetSnackBar(
+        title: 'Success',
+        message: 'Item moved to Closet',
+        duration: Duration(seconds: 2),
+      ),
     );
   }
 
@@ -64,10 +71,12 @@ class AppPageController extends GetxController {
     // Rebuild
     update();
     // Show a notification
-    Get.snackbar(
-      'Success',
-      'Item moved to Laundry',
-      duration: const Duration(seconds: 1),
+    SnackbarManager().showSnackbar(
+      const GetSnackBar(
+        title: 'Success',
+        message: 'Item moved to Laundry',
+        duration: Duration(seconds: 2),
+      ),
     );
   }
 
@@ -90,9 +99,12 @@ class AppPageController extends GetxController {
               Get.back();
               await dbHelper.deleteData(id);
               dbHelper.refreshAll();
-              Get.snackbar(
-                "Deletion",
-                "Entry Deleted!",
+              SnackbarManager().showSnackbar(
+                const GetSnackBar(
+                  title: 'Deletion',
+                  message: 'Entry Deleted!',
+                  duration: Duration(seconds: 2),
+                ),
               );
             },
             child: const Text("YES"),

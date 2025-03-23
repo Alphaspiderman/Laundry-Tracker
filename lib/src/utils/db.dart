@@ -20,6 +20,10 @@ class DatabaseHelper {
   static Directory? appDir;
   static Logger log = Get.find();
 
+  // ----------------------------------------------------------------
+  // Database Setup
+  // ----------------------------------------------------------------
+
   Future<Database> get database async {
     appDir = await getApplicationDocumentsDirectory();
     if (_database != null) return _database!;
@@ -34,55 +38,6 @@ class DatabaseHelper {
   Future<void> initClass() async {
     appDir = await getApplicationDocumentsDirectory();
     await initDatabase();
-  }
-
-  // Function to refresh all list controllers
-  void refreshAll() {
-    Get.find<ListController>(tag: "basket").refreshData(States.basket);
-    Get.find<ListController>(tag: "closet").refreshData(States.closet);
-    Get.find<ListController>(tag: "laundry").refreshData(States.laundry);
-  }
-
-  Future<Map<int, Category>> fetchCategoryMap() async {
-    // Get the list of categories
-    List<Category> categories = Get.find();
-    // Create a map of Category ID to Category
-    Map<int, Category> categoryMap = {};
-    for (var category in categories) {
-      categoryMap[category.id] = category;
-    }
-    return categoryMap;
-  }
-
-  Future<void> refreshCategory() async {
-    // Check if the category list is in GetX
-    List<Category> categories;
-
-    if (Get.isRegistered<List<Category>>()) {
-      categories = Get.find();
-    } else {
-      categories = [];
-      Get.put(categories);
-    }
-    // Load categories from database
-    List<Category> dbCategories = await fetchCategories();
-    // Replace the old list with the new list
-    categories.assignAll(dbCategories);
-
-    // Check if the category map is in GetX
-    Map<int, Category> categoryMap;
-
-    if (Get.isRegistered<Map<int, Category>>()) {
-      categoryMap = Get.find();
-    } else {
-      categoryMap = {};
-      Get.put(categoryMap);
-    }
-
-    // Load the category map from the database
-    Map<int, Category> dbCategoryMap = await fetchCategoryMap();
-    // Replace the old map with the new map
-    categoryMap.addAll(dbCategoryMap);
   }
 
   Future<void> initDatabase() async {
@@ -329,111 +284,64 @@ class DatabaseHelper {
     log.i("Database initialized");
   }
 
-  Future<void> insertData(DbEntry data, File imageFile) async {
-    // Save image to local directory
-    final imagePath = join(appDir!.path, 'images', data.imagePath);
-    await imageFile.copy(imagePath);
-    // Delete the temp image
-    await imageFile.delete();
+  // ----------------------------------------------------------------
+  // Data Controller Functions
+  // ----------------------------------------------------------------
 
-    // Clean image path
-    final imagePathClean = imagePath.replaceAll(appDir!.path, '');
-
-    Database db = await database;
-
-    // Insert data into the database
-    await db.insert(
-      'clothes',
-      {
-        'name': data.name,
-        'state': data.state.index,
-        'image_path': imagePathClean,
-        'category_id': data.categoryId,
-      },
-    );
-    // Refresh all list controllers
-    refreshAll();
+  // Function to refresh all list controllers
+  void refreshAll() {
+    Get.find<ListController>(tag: "basket").refreshData(States.basket);
+    Get.find<ListController>(tag: "closet").refreshData(States.closet);
+    Get.find<ListController>(tag: "laundry").refreshData(States.laundry);
   }
 
-  Future<List<DbEntry>> fetchData() async {
-    Database db = await database;
-    // Query for all entries
-    final List<Map<String, dynamic>> maps = await db.query('clothes');
-    return generateList(maps);
+  // Function to fetch a mapping of category ID to category name
+  Future<Map<int, Category>> fetchCategoryMap() async {
+    // Get the list of categories
+    List<Category> categories = Get.find();
+    // Create a map of Category ID to Category
+    Map<int, Category> categoryMap = {};
+    for (var category in categories) {
+      categoryMap[category.id] = category;
+    }
+    return categoryMap;
   }
 
-  Future<List<DbEntry>> fetchDataByState(States state) async {
-    int dbState = state.index;
-    Database db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      'clothes',
-      where: 'state = ?',
-      whereArgs: [dbState],
-    );
+  // Function to refresh all category data
+  Future<void> refreshCategory() async {
+    // Check if the category list is in GetX
+    List<Category> categories;
 
-    return generateList(maps);
+    if (Get.isRegistered<List<Category>>()) {
+      categories = Get.find();
+    } else {
+      categories = [];
+      Get.put(categories);
+    }
+    // Load categories from database
+    List<Category> dbCategories = await fetchCategories();
+    // Replace the old list with the new list
+    categories.assignAll(dbCategories);
+
+    // Check if the category map is in GetX
+    Map<int, Category> categoryMap;
+
+    if (Get.isRegistered<Map<int, Category>>()) {
+      categoryMap = Get.find();
+    } else {
+      categoryMap = {};
+      Get.put(categoryMap);
+    }
+
+    // Load the category map from the database
+    Map<int, Category> dbCategoryMap = await fetchCategoryMap();
+    // Replace the old map with the new map
+    categoryMap.addAll(dbCategoryMap);
   }
 
-  // Fetch data by category
-  Future<List<DbEntry>> fetchDataByCategory(int categoryId) async {
-    Database db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      'clothes',
-      where: 'category_id = ?',
-      whereArgs: [categoryId],
-    );
-
-    return generateList(maps);
-  }
-
-  // Update State
-  Future<void> updateState(int id, States state) async {
-    Database db = await database;
-    int dbState = state.index;
-    await db.update(
-      'clothes',
-      {'state': dbState},
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-    refreshAll();
-  }
-
-  // Update Category for an entry
-  Future<void> updateCategoryForItem(int id, int categoryId) async {
-    Database db = await database;
-    await db.update(
-      'clothes',
-      {'category_id': categoryId},
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-    await refreshCategory();
-  }
-
-  // Delete a card
-  Future<void> deleteData(int id) async {
-    Database db = await database;
-    // Get the data to delete
-    final data = await db.query(
-      'clothes',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-    log.d("Data to delete: $data");
-    // Get the image path
-    var map = Map<String, dynamic>.from(data[0]);
-    map.addEntries([MapEntry('prepend', appDir!.path)]);
-    // Convert to DbEntry
-    final dataEntry = DbEntry.fromMap(map);
-    // Delete the data
-    await db.delete(
-      'clothes',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-    await File(dataEntry.imagePath).delete();
-  }
+  // ----------------------------------------------------------------
+  // CRUD for Categories
+  // ----------------------------------------------------------------
 
   // Add a category
   Future<void> addCategory(String name) async {
@@ -444,37 +352,6 @@ class DatabaseHelper {
       {
         'name': name,
       },
-    );
-    await refreshCategory();
-  }
-
-  // Rename a category
-  Future<void> renameCategory(int id, String name) async {
-    // Prevent the default category from being renamed
-    if (id == 1) {
-      throw DbException("Default category cannot be renamed");
-    }
-    // Prevent the category from being renamed to Default
-    if (name == "Default") {
-      throw DbException("Category name cannot be Default");
-    }
-    // Prevent the category name from being empty
-    if (name.isEmpty) {
-      throw DbException("Category name cannot be empty");
-    }
-    // Prevent the category name from already existing
-    if (await checkCategory(name)) {
-      throw DbException("Category already exists");
-    }
-
-    // Get the database
-    Database db = await database;
-    // Update the category
-    await db.update(
-      'categories',
-      {'name': name},
-      where: 'id = ?',
-      whereArgs: [id],
     );
     await refreshCategory();
   }
@@ -512,6 +389,37 @@ class DatabaseHelper {
     });
   }
 
+  // Rename a category
+  Future<void> renameCategory(int id, String name) async {
+    // Prevent the default category from being renamed
+    if (id == 1) {
+      throw DbException("Default category cannot be renamed");
+    }
+    // Prevent the category from being renamed to Default
+    if (name == "Default") {
+      throw DbException("Category name cannot be Default");
+    }
+    // Prevent the category name from being empty
+    if (name.isEmpty) {
+      throw DbException("Category name cannot be empty");
+    }
+    // Prevent the category name from already existing
+    if (await checkCategory(name)) {
+      throw DbException("Category already exists");
+    }
+
+    // Get the database
+    Database db = await database;
+    // Update the category
+    await db.update(
+      'categories',
+      {'name': name},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    await refreshCategory();
+  }
+
   // Delete a category
   Future<void> deleteCategory(int id) async {
     // Make sure its not the default category
@@ -534,6 +442,187 @@ class DatabaseHelper {
     );
     await refreshCategory();
   }
+
+  // ----------------------------------------------------------------
+  // CRUD for Clothes
+  // ----------------------------------------------------------------
+
+  // Create a clothes entry
+  Future<void> insertData(DbEntry data, File imageFile) async {
+    // Save image to local directory
+    final imagePath = join(appDir!.path, 'images', data.imagePath);
+    await imageFile.copy(imagePath);
+    // Delete the temp image
+    await imageFile.delete();
+
+    // Clean image path
+    final imagePathClean = imagePath.replaceAll(appDir!.path, '');
+
+    Database db = await database;
+
+    // Insert data into the database
+    await db.insert(
+      'clothes',
+      {
+        'name': data.name,
+        'state': data.state.index,
+        'image_path': imagePathClean,
+        'category_id': data.categoryId,
+      },
+    );
+    // Refresh all list controllers
+    refreshAll();
+  }
+
+  // Fetch all clothes
+  Future<List<DbEntry>> fetchData() async {
+    Database db = await database;
+    // Query for all entries
+    final List<Map<String, dynamic>> maps = await db.query('clothes');
+    return generateList(maps);
+  }
+
+  // Fetch data by state
+  Future<List<DbEntry>> fetchDataByState(States state) async {
+    int dbState = state.index;
+    Database db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'clothes',
+      where: 'state = ?',
+      whereArgs: [dbState],
+    );
+
+    return generateList(maps);
+  }
+
+  // Fetch data by category
+  Future<List<DbEntry>> fetchDataByCategory(int categoryId) async {
+    Database db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'clothes',
+      where: 'category_id = ?',
+      whereArgs: [categoryId],
+    );
+
+    return generateList(maps);
+  }
+
+  // Update State of an entry
+  Future<void> updateState(int id, States state) async {
+    Database db = await database;
+    int dbState = state.index;
+    await db.update(
+      'clothes',
+      {'state': dbState},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    refreshAll();
+  }
+
+  // Update Category for an entry
+  Future<void> updateCategoryForItem(int id, int categoryId) async {
+    Database db = await database;
+    await db.update(
+      'clothes',
+      {'category_id': categoryId},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    await refreshCategory();
+  }
+
+  // Update the name of an entry
+  Future<void> updateNameOfItem(int id, String value) async {
+    // Update the name for the entry
+    Database db = await database;
+
+    await db.update(
+      'clothes',
+      {'name': value},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  // Delete an entry
+  Future<void> deleteData(int id) async {
+    Database db = await database;
+    // Get the data to delete
+    final data = await db.query(
+      'clothes',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    log.d("Data to delete: $data");
+    // Get the image path
+    var map = Map<String, dynamic>.from(data[0]);
+    map.addEntries([MapEntry('prepend', appDir!.path)]);
+    // Convert to DbEntry
+    final dataEntry = DbEntry.fromMap(map);
+    // Delete the data
+    await db.delete(
+      'clothes',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    await File(dataEntry.imagePath).delete();
+  }
+
+  // ----------------------------------------------------------------
+  // Misc Functions
+  // ----------------------------------------------------------------
+
+  // Get Stats
+  Future<Map<String, int>> getStats() async {
+    Database db = await database;
+    // Query for all entries
+    final List<Map<String, dynamic>> maps = await db.query('clothes');
+
+    // Generate a list of DbEntry
+    List<DbEntry> dataList = generateList(maps, prepend: false);
+
+    // Declare the map
+    Map<String, int> stats = {
+      "Total": 0,
+      "Closet": 0,
+      "Basket": 0,
+      "Wash": 0,
+    };
+
+    // Count the number of items in each state
+    for (var data in dataList) {
+      stats["Total"] = stats["Total"]! + 1;
+      switch (data.state) {
+        case States.closet:
+          stats["Closet"] = stats["Closet"]! + 1;
+          break;
+        case States.basket:
+          stats["Basket"] = stats["Basket"]! + 1;
+          break;
+        case States.laundry:
+          stats["Wash"] = stats["Wash"]! + 1;
+          break;
+      }
+    }
+
+    return stats;
+  }
+
+  // Generate a list of DbEntry from a list of maps
+  List<DbEntry> generateList(List<Map<String, dynamic>> maps,
+      {bool prepend = true}) {
+    return List.generate(maps.length, (index) {
+      // Create a editable copy of the map
+      var map = Map<String, dynamic>.from(maps[index]);
+      map.addEntries([MapEntry('prepend', prepend ? appDir!.path : '')]);
+      return DbEntry.fromMap(map);
+    });
+  }
+
+  // ----------------------------------------------------------------
+  // Import-Export Functions
+  // ----------------------------------------------------------------
 
   // Import data
   Future<void> importData(File file) async {
@@ -726,65 +815,7 @@ class DatabaseHelper {
     Get.offAllNamed("/home");
   }
 
-  // Generate a list of DbEntry from a list of maps
-  List<DbEntry> generateList(List<Map<String, dynamic>> maps,
-      {bool prepend = true}) {
-    return List.generate(maps.length, (index) {
-      // Create a editable copy of the map
-      var map = Map<String, dynamic>.from(maps[index]);
-      map.addEntries([MapEntry('prepend', prepend ? appDir!.path : '')]);
-      return DbEntry.fromMap(map);
-    });
-  }
-
-  // Get Stats
-  Future<Map<String, int>> getStats() async {
-    Database db = await database;
-    // Query for all entries
-    final List<Map<String, dynamic>> maps = await db.query('clothes');
-
-    // Generate a list of DbEntry
-    List<DbEntry> dataList = generateList(maps, prepend: false);
-
-    // Declare the map
-    Map<String, int> stats = {
-      "Total": 0,
-      "Closet": 0,
-      "Basket": 0,
-      "Wash": 0,
-    };
-
-    // Count the number of items in each state
-    for (var data in dataList) {
-      stats["Total"] = stats["Total"]! + 1;
-      switch (data.state) {
-        case States.closet:
-          stats["Closet"] = stats["Closet"]! + 1;
-          break;
-        case States.basket:
-          stats["Basket"] = stats["Basket"]! + 1;
-          break;
-        case States.laundry:
-          stats["Wash"] = stats["Wash"]! + 1;
-          break;
-      }
-    }
-
-    return stats;
-  }
-
-  Future<void> updateNameOfItem(int id, String value) async {
-    // Update the name for the entry
-    Database db = await database;
-
-    await db.update(
-      'clothes',
-      {'name': value},
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-  }
-
+  // Import data from version 1
   Future<void> importFromVersion1() async {
     // Import data from version 1 of the app
     // Declare the directory for the imported data
@@ -848,6 +879,7 @@ class DatabaseHelper {
     });
   }
 
+  // Import data from version 2
   Future<void> importFromVersion2() async {
     // Import data from version 2 of the app
     // Declare the directory for the imported data
@@ -950,6 +982,7 @@ class DatabaseHelper {
         "UPDATE SQLITE_SEQUENCE SET SEQ=${maxIdMisc[0]['MAX(id)']} WHERE NAME='misc_clothes'");
   }
 
+  // Import data from version 3
   Future<void> importFromVersion3() async {
     // Import data from version 3 of the app
 

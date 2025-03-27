@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:clothes_tracker/src/models/category.dart';
 import 'package:clothes_tracker/src/models/db_exception.dart';
 import 'package:clothes_tracker/src/models/db_entry.dart';
+import 'package:clothes_tracker/src/models/misc_item.dart';
 import 'package:clothes_tracker/src/models/state.dart';
 import 'package:clothes_tracker/src/utils/list_controller.dart';
 import 'package:file_picker/file_picker.dart';
@@ -567,6 +568,120 @@ class DatabaseHelper {
       whereArgs: [id],
     );
     await File(dataEntry.imagePath).delete();
+  }
+
+  // ----------------------------------------------------------------
+  // CRUD for Misc Clothes
+  // ----------------------------------------------------------------
+
+  // Create a misc clothes entry
+  Future<void> insertMisc(MiscItem data) async {
+    Database db = await database;
+    // Insert data into the database
+    await db.insert(
+      'misc_clothes',
+      {
+        'name': data.name,
+        'closet': data.closet,
+        'basket': data.basket,
+        'wash': data.wash,
+        'total': data.total,
+      },
+    );
+  }
+
+  // Fetch all misc clothes
+  Future<List<MiscItem>> fetchMisc() async {
+    Database db = await database;
+    // Query for all entries
+    final List<Map<String, dynamic>> maps = await db.query('misc_clothes');
+    return List.generate(maps.length, (index) {
+      return MiscItem(
+        id: maps[index]['id'],
+        name: maps[index]['name'],
+        closet: maps[index]['closet'],
+        basket: maps[index]['basket'],
+        wash: maps[index]['wash'],
+        total: maps[index]['total'],
+      );
+    });
+  }
+
+  // Fetch Misc Item by ID
+  Future<MiscItem> fetchMiscById(int id) async {
+    Database db = await database;
+    // Query for the misc item
+    final List<Map<String, dynamic>> maps = await db.query(
+      'misc_clothes',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+    return MiscItem(
+      id: maps[0]['id'],
+      name: maps[0]['name'],
+      closet: maps[0]['closet'],
+      basket: maps[0]['basket'],
+      wash: maps[0]['wash'],
+      total: maps[0]['total'],
+    );
+  }
+
+  // Update the quantity of a misc item
+  Future<void> transferMisc(int id, int closet, int basket, int wash,
+      [bool updateTotal = false]) async {
+    Database db = await database;
+    // Fetch total quantity of the misc item
+    MiscItem miscItem = await fetchMiscById(id);
+    // Update the data
+    if (updateTotal) {
+      await db.update(
+        'misc_clothes',
+        {
+          'closet': closet,
+          'basket': basket,
+          'wash': wash,
+          'total': closet + basket + wash,
+        },
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    } else {
+      assert(closet + basket + wash == miscItem.total);
+      await db.update(
+        'misc_clothes',
+        {
+          'closet': closet,
+          'basket': basket,
+          'wash': wash,
+        },
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    }
+  }
+
+  // Update the name of a misc item
+  Future<void> updateNameOfMisc(int id, String value) async {
+    // Update the name for the entry
+    Database db = await database;
+
+    await db.update(
+      'misc_clothes',
+      {'name': value},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
+  // Delete a misc item
+  Future<void> deleteMisc(int id) async {
+    Database db = await database;
+    // Delete the misc item
+    await db.delete(
+      'misc_clothes',
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 
   // ----------------------------------------------------------------
